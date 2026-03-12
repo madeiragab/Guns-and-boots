@@ -12,8 +12,8 @@ class Character:
         self.defense  = defense
         self.heat     = 0
         self.cover    = False
-        self.medkits  = 3
-        self.skip_next = False
+        self.medkits  = 1
+        self.special_cooldown = 0
 
     # ------------------------------------------------------------------
     def is_alive(self):
@@ -48,5 +48,5 @@ class Character:
         self.hp      = self.max_hp
         self.heat    = 0
         self.cover   = False
-        self.medkits = 3
-        self.skip_next = False
+        self.medkits = 1
+        self.special_cooldown = 0

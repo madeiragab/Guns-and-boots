@@ -6,7 +6,7 @@ WHITE = (255, 255, 255)
 GRAY  = (100, 100, 100)
 BLACK = (0,   0,   0)
 
-MENU_ITEMS = ["BATTLE", "QUIT"]
+MENU_ITEMS = ["BATALHA", "SAIR"]
 
 
 class HubState(BaseState):
@@ -49,11 +49,19 @@ class HubState(BaseState):
 
     def _confirm(self):
         choice = MENU_ITEMS[self._selected]
-        if choice == "BATTLE":
+        if choice == "BATALHA":
             import random
             import os
             from entities.enemy import Enemy
             from states.battle_state import BattleState
+
+            # Fresh run — reset enemy progression and player level
+            self.game.defeated_enemies = []
+            self.game.enemy_round = 0
+            self.game.player.level = 1
+            self.game.player.atk = 7
+            self.game.player.max_hp = 30
+            self.game.player.hp = 30
 
             # Look for available enemy folders under assets/sprites/Enemy
             base = os.path.join("assets", "sprites", "Enemy")
@@ -68,7 +76,7 @@ class HubState(BaseState):
 
             if enemy_folders:
                 profile = random.choice(enemy_folders)
-                print(f"[HubState] enemy_folders={enemy_folders} -> chosen: {profile}")
+                print(f"[HubState] starting fresh run -> chosen: {profile}")
             else:
                 profile = random.choice(["GRUNT", "HEAVY", "SNIPER"])
                 print(f"[HubState] no enemy folders, chosen profile: {profile}")
@@ -76,7 +84,7 @@ class HubState(BaseState):
             enemy = Enemy(profile)
             self.game.player.reset_for_battle()
             self.game.state_manager.change(BattleState(self.game, self.game.player, enemy))
-        elif choice == "QUIT":
+        elif choice == "SAIR":
             self.game.quit()
 
     def update(self, dt):
@@ -90,11 +98,11 @@ class HubState(BaseState):
 
         # Heading
         welcome = font_title.render(
-            f"WELCOME, {self.game.player.name}", True, WHITE
+            f"BEM-VINDO, {self.game.player.name}", True, WHITE
         )
         screen.blit(welcome, (W // 2 - welcome.get_width() // 2, 60))
 
-        sub = font_small.render("Choose your next move.", True, GRAY)
+        sub = font_small.render("Escolha sua proxima acao.", True, GRAY)
         screen.blit(sub, (W // 2 - sub.get_width() // 2, 100))
 
         # Buttons

@@ -2,6 +2,7 @@ import os
 import pygame
 
 from entities.character import Character
+from entities.projectile import load_bullet_frames
 from core.sprite_animator import load_animations_from_folders, SpriteAnimator
 
 
@@ -23,9 +24,13 @@ class Enemy(Character):
         },
     }
 
-    def __init__(self, profile="GRUNT"):
+    def __init__(self, profile="GRUNT", level=0):
+        # Save the original folder name for tracking (never overwritten by meta)
+        self.folder_name = profile
+        self.level = level
         # If profile matches a known profile, use those stats.
         data = self.PROFILES.get(profile)
+        display_name = profile
         # Also allow overriding stats from an optional meta.json inside the enemy folder
         # Path: assets/sprites/Enemy/<profile>/meta.json
         meta_path = None
@@ -41,9 +46,9 @@ class Enemy(Character):
                 if data is None:
                     data = {}
                 data.update({k: meta[k] for k in ("hp", "atk", "defense") if k in meta})
-                # allow renaming
+                # allow renaming (display only)
                 if "name" in meta:
-                    profile = meta["name"]
+                    display_name = meta["name"]
         except Exception:
             pass
 
@@ -52,17 +57,17 @@ class Enemy(Character):
             data = {"hp": 22, "atk": 5, "defense": 1, "sprite": None}
 
         super().__init__(
-            name=profile,
-            hp=data["hp"],
-            atk=data["atk"],
-            defense=data["defense"],
+            name=display_name,
+            hp=data["hp"] + level * 5,
+            atk=data["atk"] + level * 1,
+            defense=data["defense"] + level * 1,
         )
-        self.profile = profile
+        self.profile = self.folder_name
 
         # Try to load animations from assets/sprites/Enemy/<profile>/
         try:
             base = os.path.join("assets", "sprites", "Enemy")
-            path = os.path.join(base, profile)
+            path = os.path.join(base, self.folder_name)
             animations = {}
             if os.path.isdir(path):
                 animations = load_animations_from_folders(path, scale=1, colorkey=(0, 0, 0), target_size=(160, 160))
@@ -86,6 +91,10 @@ class Enemy(Character):
             animations = {"idle": [s]}
 
         self.animator = SpriteAnimator(animations, default="idle", fps=12, return_to_idle=True)
+
+        # Load bullet frames (flipped for enemy direction)
+        self.bullet_frames = load_bullet_frames(flip=True)
+        self.special_bullet_frames = self.bullet_frames
 
     def play(self, action):
         action = action if action in self.animator.animations else "idle"

@@ -5,6 +5,7 @@ from ui.healthbar import HealthBar
 from ui.logbox    import LogBox
 from systems.combat import resolve_action
 from systems.ai     import choose_action
+from entities.projectile import Projectile
 import os
 import random
 
@@ -14,7 +15,7 @@ BLACK  = (0,   0,   0)
 RED    = (200, 40,  40)
 ORANGE = (210, 130, 0)
 
-ACTIONS = ["SHOOT", "TAKE COVER", "OVERCHARGE", "MEDKIT"]
+ACTIONS = ["ATIRAR", "COBERTURA", "ESPECIAL", "MEDKIT"]
 
 # ── Layout constants ──────────────────────────────────────────────────
 W, H = 640, 360
@@ -66,22 +67,28 @@ class BattleState(BaseState):
         self._selected = 0
         self._waiting = False
         self._wait_timer = 0.0
+        self._projectiles = []  # active projectiles on screen
+
+        # Sprite positions (used for projectile start/end)
+        self._player_pos = (80, H - 10)
+        self._enemy_pos = (W - 80, H - 10)
 
         # Buttons (kept for input handling but not drawn)
         self._buttons = [
             Button(MENU_X, MENU_Y + i * (BTN_H + BTN_GAP), BTN_W, BTN_H, label)
             for i, label in enumerate(ACTIONS)
         ]
+        self._update_disabled_buttons()
         self._update_selection()
 
         # Health bars for each combatant; will be positioned above sprites
         bar_w, bar_h = 120, 12
-        self._enemy_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.enemy.max_hp, label="ENEMY HP", dynamic_color=True)
-        self._player_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.player.max_hp, label="PLAYER HP", dynamic_color=True)
+        self._enemy_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.enemy.max_hp, label="HP INIMIGO", dynamic_color=True)
+        self._player_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.player.max_hp, label="HP JOGADOR", dynamic_color=True)
 
         # Log kept but not drawn
         self._log = LogBox(LOG_X, LOG_Y, LOG_W, LOG_H, max_lines=5)
-        self._log.add("Battle started!")
+        self._log.add("Batalha iniciada!")
 
         try:
             self.player.play("idle")
@@ -120,7 +127,27 @@ class BattleState(BaseState):
     # ------------------------------------------------------------------
     def _update_selection(self):
         for i, btn in enumerate(self._buttons):
-            btn.active = (i == self._selected)
+            btn.active = (i == self._selected) and not btn.disabled
+
+    def _update_disabled_buttons(self):
+        """Mark buttons as disabled based on current player state."""
+        for i, btn in enumerate(self._buttons):
+            action = ACTIONS[i]
+            if action == "MEDKIT":
+                btn.disabled = self.player.medkits <= 0
+            elif action == "ESPECIAL":
+                btn.disabled = getattr(self.player, 'special_cooldown', 0) > 0
+            else:
+                btn.disabled = False
+
+    def _skip_to_valid(self, direction):
+        """Move selection in direction (+1 or -1), skipping disabled buttons."""
+        for _ in range(len(ACTIONS)):
+            self._selected = (self._selected + direction) % len(ACTIONS)
+            if not self._buttons[self._selected].disabled:
+                return
+        # All disabled fallback (shouldn't happen)
+        self._selected = 0
 
     # ------------------------------------------------------------------
     def handle_events(self, events):
@@ -128,29 +155,24 @@ class BattleState(BaseState):
             return
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self._selected = (self._selected - 1) % len(ACTIONS)
+                if event.key in (pygame.K_UP, pygame.K_LEFT):
+                    self._skip_to_valid(-1)
                     self._update_selection()
-                elif event.key == pygame.K_DOWN:
-                    self._selected = (self._selected + 1) % len(ACTIONS)
-                    self._update_selection()
-                elif event.key == pygame.K_LEFT:
-                    self._selected = (self._selected - 1) % len(ACTIONS)
-                    self._update_selection()
-                elif event.key == pygame.K_RIGHT:
-                    self._selected = (self._selected + 1) % len(ACTIONS)
+                elif event.key in (pygame.K_DOWN, pygame.K_RIGHT):
+                    self._skip_to_valid(1)
                     self._update_selection()
                 elif event.key == pygame.K_RETURN:
-                    self._player_act(ACTIONS[self._selected].lower().replace(" ", "_"))
+                    if not self._buttons[self._selected].disabled:
+                        self._player_act(ACTIONS[self._selected].lower().replace(" ", "_"))
 
     # ------------------------------------------------------------------
     def _player_act(self, action):
-        action = action.replace("take_cover", "cover")
+        action = action.replace("atirar", "shoot").replace("cobertura", "cover").replace("especial", "special")
         # play matching animation
         anim_map = {
             "shoot": "shoot",
             "cover": "cover",
-            "overcharge": "shoot",
+            "special": "special",
             "medkit": "medkit",
         }
         try:
@@ -158,26 +180,46 @@ class BattleState(BaseState):
         except Exception:
             pass
 
-        # record enemy HP to detect if damage was applied
-        try:
-            enemy_before_hp = self.enemy.hp
-        except Exception:
-            enemy_before_hp = None
+        # For shoot/special, spawn a projectile first, then resolve on hit
+        if action in ("shoot", "special"):
+            bullet_frames = (self.player.special_bullet_frames
+                             if action == "special"
+                             else self.player.bullet_frames)
+            # Projectile flies from player to enemy
+            start = (self._player_pos[0] + 40, self._player_pos[1] - 80)
+            end = (self._enemy_pos[0] - 40, self._enemy_pos[1] - 80)
 
+            def on_hit():
+                self._resolve_player_attack(action)
+
+            proj = Projectile(bullet_frames, start, end, duration=0.35, on_hit=on_hit)
+            self._projectiles.append(proj)
+            self._turn = "projectile"
+        else:
+            # Non-projectile actions resolve immediately
+            logs = resolve_action(self.player, self.enemy, action)
+            for line in logs:
+                self._log.add(line)
+            self._after_player_action()
+
+    def _resolve_player_attack(self, action):
+        """Called when the player's projectile hits the enemy."""
+        enemy_before_hp = self.enemy.hp
         logs = resolve_action(self.player, self.enemy, action)
         for line in logs:
             self._log.add(line)
 
         # play enemy damage animation if HP decreased
-        try:
-            if enemy_before_hp is not None and self.enemy.hp < enemy_before_hp:
-                try:
-                    self.enemy.play("damage")
-                except Exception:
-                    pass
-        except Exception:
-            pass
+        if self.enemy.hp < enemy_before_hp:
+            try:
+                self.enemy.play("damage")
+            except Exception:
+                pass
 
+        self._after_player_action()
+
+    def _after_player_action(self):
+        """After player action resolves, check win or schedule enemy turn."""
         if not self.enemy.is_alive():
             self._end_battle("win")
             return
@@ -189,41 +231,83 @@ class BattleState(BaseState):
 
     # ------------------------------------------------------------------
     def _enemy_act(self):
+        # Tick down enemy cooldowns
+        if self.enemy.special_cooldown > 0:
+            self.enemy.special_cooldown -= 1
         action = choose_action(self.enemy, self.player)
         # play enemy animation for this action
-        anim_map = {
-            "shoot": "shoot",
-            "cover": "cover",
-            "overcharge": "shoot",
-            "medkit": "medkit",
-        }
+        if action == "special" and "special" in self.enemy.animator.animations:
+            anim_name = "special"
+        else:
+            anim_name = {"shoot": "shoot", "cover": "cover", "special": "shoot", "medkit": "medkit"}.get(action, "idle")
         try:
-            self.enemy.play(anim_map.get(action, "idle"))
+            self.enemy.play(anim_name)
         except Exception:
             pass
 
+        if action in ("shoot", "special"):
+            bullet_frames = (self.enemy.special_bullet_frames
+                             if action == "special"
+                             else self.enemy.bullet_frames)
+            # Projectile flies from enemy to player
+            start = (self._enemy_pos[0] - 40, self._enemy_pos[1] - 80)
+            end = (self._player_pos[0] + 40, self._player_pos[1] - 80)
+
+            def on_hit(act=action):
+                self._resolve_enemy_attack(act)
+
+            proj = Projectile(bullet_frames, start, end, duration=0.35, on_hit=on_hit)
+            self._projectiles.append(proj)
+            self._turn = "projectile_enemy"
+        else:
+            logs = resolve_action(self.enemy, self.player, action)
+            for line in logs:
+                self._log.add(line)
+            self._after_enemy_action()
+
+    def _resolve_enemy_attack(self, action):
+        """Called when the enemy's projectile hits the player."""
+        player_before_hp = self.player.hp
         logs = resolve_action(self.enemy, self.player, action)
         for line in logs:
             self._log.add(line)
 
-        if not self.player.is_alive():
-            self._end_battle("lose")
-            return
-
-        # If enemy attacked, show player damage animation
-        if action in ("shoot", "overcharge"):
+        if self.player.hp < player_before_hp:
             try:
                 self.player.play("damage")
             except Exception:
                 pass
 
+        self._after_enemy_action()
+
+    def _after_enemy_action(self):
+        """After enemy action resolves, check loss or return to player turn."""
+        if not self.player.is_alive():
+            self._end_battle("lose")
+            return
+
         self._turn = "player"
+        # Tick down cooldowns at start of player turn
+        if self.player.special_cooldown > 0:
+            self.player.special_cooldown -= 1
+        self._update_disabled_buttons()
+        # If current selection is now disabled, move to a valid one
+        if self._buttons[self._selected].disabled:
+            self._skip_to_valid(1)
+        self._update_selection()
 
     # ------------------------------------------------------------------
     def _end_battle(self, outcome):
-        self._turn = "gameover"
-        from states.result_state import ResultState
-        self.game.state_manager.change(ResultState(self.game, outcome))
+        self._turn = "dying"
+        self._death_outcome = outcome
+        self._death_timer = 0.0
+        self._death_duration = 1.5  # seconds for red tint + fade out
+        # Switch the dead character to idle
+        dead = self.enemy if outcome == "win" else self.player
+        try:
+            dead.play("idle")
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     def update(self, dt):
@@ -238,11 +322,47 @@ class BattleState(BaseState):
         except Exception:
             pass
 
+        # Update active projectiles
+        for proj in self._projectiles:
+            proj.update(dt)
+        self._projectiles = [p for p in self._projectiles if not p.finished]
+
+        if self._turn == "dying":
+            self._death_timer += dt
+            if self._death_timer >= self._death_duration:
+                from states.result_state import ResultState
+                is_boss = getattr(self.enemy, '_is_boss', False)
+                self.game.state_manager.change(
+                    ResultState(self.game, self._death_outcome, self.enemy.profile, is_boss=is_boss)
+                )
+            return
+
+        # When projectile phase is done (all projectiles finished), the on_hit
+        # callback already moved the turn forward, so nothing extra needed here.
+
         if self._waiting:
             self._wait_timer += dt
             if self._wait_timer >= 0.80:
                 self._waiting = False
                 self._enemy_act()
+
+    # ------------------------------------------------------------------
+    def _get_death_alpha(self):
+        """Return (is_dying, alpha 0-255) for the dead character during death phase."""
+        if self._turn != "dying":
+            return False, 255
+        progress = min(1.0, self._death_timer / self._death_duration)
+        alpha = max(0, int(255 * (1.0 - progress)))
+        return True, alpha
+
+    def _tint_red_and_fade(self, img, alpha):
+        """Return a copy of img tinted red with given alpha."""
+        tinted = img.copy()
+        red_overlay = pygame.Surface(tinted.get_size(), pygame.SRCALPHA)
+        red_overlay.fill((255, 0, 0, 100))
+        tinted.blit(red_overlay, (0, 0))
+        tinted.set_alpha(alpha)
+        return tinted
 
     # ------------------------------------------------------------------
     def draw(self, screen):
@@ -257,6 +377,11 @@ class BattleState(BaseState):
 
         font_small = pygame.font.SysFont("Courier New", 12)
 
+        # Death effect state
+        is_dying, death_alpha = self._get_death_alpha()
+        player_dying = is_dying and getattr(self, '_death_outcome', '') == "lose"
+        enemy_dying  = is_dying and getattr(self, '_death_outcome', '') == "win"
+
         # Optional: draw player sprite in the left area (behind where UI used to be)
         try:
             # player at bottom-left corner (feet anchored) moved slightly right
@@ -270,13 +395,20 @@ class BattleState(BaseState):
                 img = None
 
             # draw sprite (uses midbottom anchoring)
-            self.player.draw(screen, (px, py))
+            if img is not None and player_dying:
+                tinted = self._tint_red_and_fade(img, death_alpha)
+                rect = tinted.get_rect(midbottom=(px, py))
+                screen.blit(tinted, rect)
+            else:
+                self.player.draw(screen, (px, py))
 
-            # draw name above sprite
+            # draw name + level above sprite
             if img is not None:
                 rect = img.get_rect(midbottom=(px, py))
                 name_font = pygame.font.SysFont("Courier New", 14, bold=True)
-                name_surf = name_font.render(self.player.name, True, (50, 200, 80))
+                lvl = getattr(self.player, 'level', 1)
+                label = f"{self.player.name}  Lv.{lvl}"
+                name_surf = name_font.render(label, True, (50, 200, 80))
                 name_r = name_surf.get_rect(midbottom=(rect.centerx, rect.top - 6))
                 screen.blit(name_surf, name_r)
         except Exception:
@@ -302,14 +434,20 @@ class BattleState(BaseState):
             # enemy animator is updated in update(dt)
 
             try:
-                self.enemy.draw(screen, (ex, ey))
-                # draw enemy name above sprite
                 img = None
                 try:
                     img = self.enemy.animator.get_image()
                 except Exception:
                     img = None
 
+                if img is not None and enemy_dying:
+                    tinted = self._tint_red_and_fade(img, death_alpha)
+                    rect = tinted.get_rect(midbottom=(ex, ey))
+                    screen.blit(tinted, rect)
+                else:
+                    self.enemy.draw(screen, (ex, ey))
+
+                # draw enemy name above sprite
                 if img is not None:
                     rect = img.get_rect(midbottom=(ex, ey))
                     name_font = pygame.font.SysFont("Courier New", 14, bold=True)
@@ -330,6 +468,10 @@ class BattleState(BaseState):
                 screen.blit(lbl, lbl_r)
         except Exception:
             pass
+
+        # Draw projectiles
+        for proj in self._projectiles:
+            proj.draw(screen)
 
         # Draw buttons centered at bottom (compact row)
         try:

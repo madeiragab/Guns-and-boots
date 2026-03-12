@@ -28,13 +28,11 @@ class NameInputState(BaseState):
                 if event.key == pygame.K_RETURN:
                     name = self._name.strip()
                     if not name:
-                        self._error = "Name cannot be empty."
+                        self._error = "O nome nao pode estar vazio."
                         return
-                    # Store name and go to hub
-                    from entities.player import Player
-                    from states.hub_state import HubState
-                    self.game.player = Player(name.upper())
-                    self.game.state_manager.change(HubState(self.game))
+                    # Go to character selection
+                    from states.select_state import SelectState
+                    self.game.state_manager.change(SelectState(self.game, name.upper()))
 
                 elif event.key == pygame.K_ESCAPE:
                     from states.title_state import TitleState
@@ -62,7 +60,7 @@ class NameInputState(BaseState):
         font_title = pygame.font.SysFont("Courier New", 28, bold=True)
         font       = pygame.font.SysFont("Courier New", 18)
 
-        title = font_title.render("ENTER YOUR NAME", True, WHITE)
+        title = font_title.render("DIGITE SEU NOME", True, WHITE)
         screen.blit(title, (W // 2 - title.get_width() // 2, H // 4))
 
         # Input box
@@ -83,6 +81,6 @@ class NameInputState(BaseState):
 
         # Hints
         hint = pygame.font.SysFont("Courier New", 13).render(
-            "ENTER confirm     ESC back", True, GRAY
+            "ENTER confirmar     ESC voltar", True, GRAY
         )
         screen.blit(hint, (W // 2 - hint.get_width() // 2, H - 30))
