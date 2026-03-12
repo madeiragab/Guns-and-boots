@@ -51,10 +51,29 @@ class HubState(BaseState):
         choice = MENU_ITEMS[self._selected]
         if choice == "BATTLE":
             import random
+            import os
             from entities.enemy import Enemy
             from states.battle_state import BattleState
-            profile = random.choice(["GRUNT", "HEAVY", "SNIPER"])
-            enemy   = Enemy(profile)
+
+            # Look for available enemy folders under assets/sprites/Enemy
+            base = os.path.join("assets", "sprites", "Enemy")
+            enemy_folders = []
+            try:
+                for name in os.listdir(base):
+                    full = os.path.join(base, name)
+                    if os.path.isdir(full):
+                        enemy_folders.append(name)
+            except Exception:
+                enemy_folders = []
+
+            if enemy_folders:
+                profile = random.choice(enemy_folders)
+                print(f"[HubState] enemy_folders={enemy_folders} -> chosen: {profile}")
+            else:
+                profile = random.choice(["GRUNT", "HEAVY", "SNIPER"])
+                print(f"[HubState] no enemy folders, chosen profile: {profile}")
+
+            enemy = Enemy(profile)
             self.game.player.reset_for_battle()
             self.game.state_manager.change(BattleState(self.game, self.game.player, enemy))
         elif choice == "QUIT":

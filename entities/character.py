@@ -13,6 +13,7 @@ class Character:
         self.heat     = 0
         self.cover    = False
         self.medkits  = 3
+        self.skip_next = False
 
     # ------------------------------------------------------------------
     def is_alive(self):
@@ -48,3 +49,4 @@ class Character:
         self.heat    = 0
         self.cover   = False
         self.medkits = 3
+        self.skip_next = False

@@ -5,6 +5,8 @@ from ui.healthbar import HealthBar
 from ui.logbox    import LogBox
 from systems.combat import resolve_action
 from systems.ai     import choose_action
+import os
+import random
 
 WHITE  = (255, 255, 255)
 GRAY   = (80,  80,  80)
@@ -39,16 +41,15 @@ HEAT_BAR_Y     = PLAYER_PANEL_Y + 64
 HEAT_BAR_W     = 180
 HEAT_BAR_H     = 10
 
-# Action menu  (bottom-right)
+# Action menu  (bottom-right) -- kept for input layout though not drawn
 MENU_X     = W // 2 + 20
 MENU_Y     = H - 130
 BTN_W, BTN_H = 170, 22
 BTN_GAP    = 4
 
-# Log box
+# Log box (not drawn currently)
 LOG_X, LOG_Y = 10, H - 130
 LOG_W, LOG_H = W // 2 - 20, 90
-
 
 class BattleState(BaseState):
     """
@@ -58,38 +59,63 @@ class BattleState(BaseState):
     def __init__(self, game, player, enemy):
         super().__init__(game)
         self.player = player
-        self.enemy  = enemy
+        self.enemy = enemy
 
     def on_enter(self):
-        self._turn     = "player"       # "player" | "enemy" | "gameover"
+        self._turn = "player"
         self._selected = 0
-        self._waiting  = False          # True while enemy "thinking" delay
+        self._waiting = False
         self._wait_timer = 0.0
 
-        # Buttons
+        # Buttons (kept for input handling but not drawn)
         self._buttons = [
             Button(MENU_X, MENU_Y + i * (BTN_H + BTN_GAP), BTN_W, BTN_H, label)
             for i, label in enumerate(ACTIONS)
         ]
         self._update_selection()
 
-        # Bars
-        self._enemy_hp_bar = HealthBar(
-            ENEMY_BAR_X, ENEMY_BAR_Y, ENEMY_BAR_W, ENEMY_BAR_H,
-            self.enemy.max_hp, label="HP", dynamic_color=True
-        )
-        self._player_hp_bar = HealthBar(
-            PLAYER_BAR_X, PLAYER_BAR_Y, PLAYER_BAR_W, PLAYER_BAR_H,
-            self.player.max_hp, label="HP", dynamic_color=True
-        )
-        self._heat_bar = HealthBar(
-            PLAYER_BAR_X, HEAT_BAR_Y, HEAT_BAR_W, HEAT_BAR_H,
-            10, color=ORANGE, label="HEAT", dynamic_color=False
-        )
+        # Health bars for each combatant; will be positioned above sprites
+        bar_w, bar_h = 120, 12
+        self._enemy_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.enemy.max_hp, label="ENEMY HP", dynamic_color=True)
+        self._player_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.player.max_hp, label="PLAYER HP", dynamic_color=True)
 
-        # Log
+        # Log kept but not drawn
         self._log = LogBox(LOG_X, LOG_Y, LOG_W, LOG_H, max_lines=5)
         self._log.add("Battle started!")
+
+        try:
+            self.player.play("idle")
+        except Exception:
+            pass
+
+        # Pick a random field background from assets/sprites/field (walk recursively)
+        try:
+            base_field = os.path.join("assets", "sprites", "field")
+            choices = []
+            for root, dirs, files in os.walk(base_field):
+                for fn in files:
+                    if fn.lower().endswith((".png", ".jpg", ".jpeg")):
+                        choices.append(os.path.join(root, fn))
+
+            if choices:
+                pick = random.choice(choices)
+                # Avoid convert_alpha/convert here in case display isn't fully initialized;
+                # pygame.image.load alone returns a usable Surface.
+                surf = pygame.image.load(pick)
+                # scale to fill screen while preserving aspect ratio
+                sw, sh = surf.get_size()
+                scale = max(W / sw, H / sh)
+                nw, nh = int(sw * scale), int(sh * scale)
+                surf = pygame.transform.smoothscale(surf, (nw, nh))
+                # center crop to window
+                x = (nw - W) // 2
+                y = (nh - H) // 2
+                self._field_surf = surf.subsurface((x, y, W, H)).copy()
+                print(f"[BattleState] picked field background: {pick}")
+            else:
+                self._field_surf = None
+        except Exception:
+            self._field_surf = None
 
     # ------------------------------------------------------------------
     def _update_selection(self):
@@ -108,15 +134,49 @@ class BattleState(BaseState):
                 elif event.key == pygame.K_DOWN:
                     self._selected = (self._selected + 1) % len(ACTIONS)
                     self._update_selection()
+                elif event.key == pygame.K_LEFT:
+                    self._selected = (self._selected - 1) % len(ACTIONS)
+                    self._update_selection()
+                elif event.key == pygame.K_RIGHT:
+                    self._selected = (self._selected + 1) % len(ACTIONS)
+                    self._update_selection()
                 elif event.key == pygame.K_RETURN:
                     self._player_act(ACTIONS[self._selected].lower().replace(" ", "_"))
 
     # ------------------------------------------------------------------
     def _player_act(self, action):
         action = action.replace("take_cover", "cover")
+        # play matching animation
+        anim_map = {
+            "shoot": "shoot",
+            "cover": "cover",
+            "overcharge": "shoot",
+            "medkit": "medkit",
+        }
+        try:
+            self.player.play(anim_map.get(action, "idle"))
+        except Exception:
+            pass
+
+        # record enemy HP to detect if damage was applied
+        try:
+            enemy_before_hp = self.enemy.hp
+        except Exception:
+            enemy_before_hp = None
+
         logs = resolve_action(self.player, self.enemy, action)
         for line in logs:
             self._log.add(line)
+
+        # play enemy damage animation if HP decreased
+        try:
+            if enemy_before_hp is not None and self.enemy.hp < enemy_before_hp:
+                try:
+                    self.enemy.play("damage")
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
         if not self.enemy.is_alive():
             self._end_battle("win")
@@ -130,13 +190,32 @@ class BattleState(BaseState):
     # ------------------------------------------------------------------
     def _enemy_act(self):
         action = choose_action(self.enemy, self.player)
-        logs   = resolve_action(self.enemy, self.player, action)
+        # play enemy animation for this action
+        anim_map = {
+            "shoot": "shoot",
+            "cover": "cover",
+            "overcharge": "shoot",
+            "medkit": "medkit",
+        }
+        try:
+            self.enemy.play(anim_map.get(action, "idle"))
+        except Exception:
+            pass
+
+        logs = resolve_action(self.enemy, self.player, action)
         for line in logs:
             self._log.add(line)
 
         if not self.player.is_alive():
             self._end_battle("lose")
             return
+
+        # If enemy attacked, show player damage animation
+        if action in ("shoot", "overcharge"):
+            try:
+                self.player.play("damage")
+            except Exception:
+                pass
 
         self._turn = "player"
 
@@ -148,6 +227,17 @@ class BattleState(BaseState):
 
     # ------------------------------------------------------------------
     def update(self, dt):
+        # update player animation
+        try:
+            self.player.update(dt)
+        except Exception:
+            pass
+        # update enemy animation
+        try:
+            self.enemy.update(dt)
+        except Exception:
+            pass
+
         if self._waiting:
             self._wait_timer += dt
             if self._wait_timer >= 0.80:
@@ -156,66 +246,100 @@ class BattleState(BaseState):
 
     # ------------------------------------------------------------------
     def draw(self, screen):
-        font       = pygame.font.SysFont("Courier New", 14)
-        font_name  = pygame.font.SysFont("Courier New", 16, bold=True)
+        # Draw field background if available, otherwise full black background.
+        if getattr(self, "_field_surf", None) is not None:
+            try:
+                screen.blit(self._field_surf, (0, 0))
+            except Exception:
+                screen.fill((0, 0, 0))
+        else:
+            screen.fill((0, 0, 0))
+
         font_small = pygame.font.SysFont("Courier New", 12)
-        font_btn   = pygame.font.SysFont("Courier New", 13)
 
-        # ── Enemy panel background ────────────────────────────────────
-        pygame.draw.rect(screen, (22, 10, 10),
-                         (0, ENEMY_PANEL_Y, PANEL_W, ENEMY_PANEL_H))
-        pygame.draw.line(screen, (80, 20, 20),
-                         (0, ENEMY_PANEL_H - 1), (PANEL_W, ENEMY_PANEL_H - 1))
+        # Optional: draw player sprite in the left area (behind where UI used to be)
+        try:
+            # player at bottom-left corner (feet anchored) moved slightly right
+            px = 80
+            py = H - 10
+            # draw sprite and also render player name above the sprite
+            img = None
+            try:
+                img = self.player.animator.get_image()
+            except Exception:
+                img = None
 
-        enemy_lbl = font_name.render(self.enemy.name, True, RED)
-        screen.blit(enemy_lbl, (ENEMY_BAR_X, ENEMY_PANEL_Y + 8))
-        self._enemy_hp_bar.draw(screen, font_small, self.enemy.hp)
+            # draw sprite (uses midbottom anchoring)
+            self.player.draw(screen, (px, py))
 
-        if self.enemy.cover:
-            cov = font_small.render("[ IN COVER ]", True, (100, 200, 255))
-            screen.blit(cov, (ENEMY_BAR_X + ENEMY_BAR_W + 8, ENEMY_BAR_Y + 2))
+            # draw name above sprite
+            if img is not None:
+                rect = img.get_rect(midbottom=(px, py))
+                name_font = pygame.font.SysFont("Courier New", 14, bold=True)
+                name_surf = name_font.render(self.player.name, True, (50, 200, 80))
+                name_r = name_surf.get_rect(midbottom=(rect.centerx, rect.top - 6))
+                screen.blit(name_surf, name_r)
+        except Exception:
+            pass
 
-        # ── Enemy "sprite" placeholder ────────────────────────────────
-        box_rect = pygame.Rect(W // 2 - 50, H // 2 - 60, 100, 100)
-        pygame.draw.rect(screen, (30, 30, 30), box_rect)
-        pygame.draw.rect(screen, GRAY, box_rect, 1)
-        sp = font_small.render(self.enemy.name, True, GRAY)
-        screen.blit(sp, (box_rect.centerx - sp.get_width() // 2,
-                         box_rect.centery - sp.get_height() // 2))
+        # Place HP bars: PLAYER on the left, ENEMY on the right
+        try:
+            self._player_hp_bar.rect.topleft = (ENEMY_BAR_X, ENEMY_BAR_Y)
+            self._player_hp_bar.draw(screen, font_small, self.player.hp)
+        except Exception:
+            pass
 
-        # ── Player panel background ───────────────────────────────────
-        pygame.draw.rect(screen, (10, 18, 10),
-                         (0, PLAYER_PANEL_Y, PANEL_W, PLAYER_PANEL_H))
-        pygame.draw.line(screen, (20, 80, 20),
-                         (0, PLAYER_PANEL_Y), (PANEL_W, PLAYER_PANEL_Y))
+        try:
+            self._enemy_hp_bar.rect.topright = (W - 10, ENEMY_BAR_Y)
+            self._enemy_hp_bar.draw(screen, font_small, self.enemy.hp)
+        except Exception:
+            pass
 
-        player_lbl = font_name.render(self.player.name, True, WHITE)
-        screen.blit(player_lbl, (PLAYER_BAR_X, PLAYER_PANEL_Y + 8))
-        self._player_hp_bar.draw(screen, font_small, self.player.hp)
-        self._heat_bar.draw(screen, font_small, self.player.heat)
+        # Draw enemy sprite at bottom-right (feet anchored)
+        try:
+            ex = W - 80
+            ey = H - 10
+            # enemy animator is updated in update(dt)
 
-        # Medkits (right of HEAT bar)
-        mk_text = "[ + ] " * self.player.medkits if self.player.medkits else "none"
-        mk = font_small.render(f"MEDKIT: {mk_text}", True, (180, 180, 180))
-        screen.blit(mk, (PLAYER_BAR_X + HEAT_BAR_W + 12, HEAT_BAR_Y - 1))
+            try:
+                self.enemy.draw(screen, (ex, ey))
+                # draw enemy name above sprite
+                img = None
+                try:
+                    img = self.enemy.animator.get_image()
+                except Exception:
+                    img = None
 
-        if self.player.cover:
-            cov = font_small.render("[ IN COVER ]", True, (100, 200, 255))
-            screen.blit(cov, (PLAYER_BAR_X + PLAYER_BAR_W + 8, PLAYER_BAR_Y + 2))
+                if img is not None:
+                    rect = img.get_rect(midbottom=(ex, ey))
+                    name_font = pygame.font.SysFont("Courier New", 14, bold=True)
+                    lbl = name_font.render(self.enemy.name, True, (200, 40, 40))
+                    lbl_r = lbl.get_rect(midbottom=(rect.centerx, rect.top - 6))
+                    screen.blit(lbl, lbl_r)
+            except Exception:
+                # fallback placeholder box
+                box_w, box_h = 80, 120
+                surf = pygame.Surface((box_w, box_h))
+                surf.fill((40, 40, 40))
+                rect = surf.get_rect(midbottom=(ex, ey))
+                pygame.draw.rect(surf, (80, 80, 80), surf.get_rect(), 2)
+                screen.blit(surf, rect)
+                name_font = pygame.font.SysFont("Courier New", 14, bold=True)
+                lbl = name_font.render(self.enemy.name, True, (200, 40, 40))
+                lbl_r = lbl.get_rect(midbottom=(rect.centerx, rect.top - 6))
+                screen.blit(lbl, lbl_r)
+        except Exception:
+            pass
 
-        # ── Action buttons ───────────────────────────────────────────
-        turn_lbl = font.render(
-            "YOUR TURN" if self._turn == "player" else "ENEMY TURN...",
-            True, WHITE
-        )
-        screen.blit(turn_lbl, (MENU_X, MENU_Y - 20))
-
-        for btn in self._buttons:
-            btn.draw(screen, font_btn)
-
-        # ── Log box ───────────────────────────────────────────────────
-        self._log.draw(screen, font_small)
-
-        # ── Hint ──────────────────────────────────────────────────────
-        hint = font_small.render("↑↓ select   ENTER confirm", True, GRAY)
-        screen.blit(hint, (MENU_X, MENU_Y + len(ACTIONS) * (BTN_H + BTN_GAP) + 4))
+        # Draw buttons centered at bottom (compact row)
+        try:
+            btn_count = len(self._buttons)
+            total_w = BTN_W * btn_count + BTN_GAP * (btn_count - 1)
+            start_x = W // 2 - total_w // 2
+            y = H - BTN_H - 10
+            for i, btn in enumerate(self._buttons):
+                bx = start_x + i * (BTN_W + BTN_GAP)
+                btn.rect.topleft = (bx, y)
+                btn.draw(screen, pygame.font.SysFont("Courier New", 13))
+        except Exception:
+            pass

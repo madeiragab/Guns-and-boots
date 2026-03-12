@@ -1,0 +1,6 @@
+{
+  "name": "Zombie",
+  "hp": 10,
+  "atk": 3,
+  "defense": 1
+}

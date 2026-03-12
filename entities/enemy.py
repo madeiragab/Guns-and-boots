@@ -1,4 +1,8 @@
+import os
+import pygame
+
 from entities.character import Character
+from core.sprite_animator import load_animations_from_folders, SpriteAnimator
 
 
 class Enemy(Character):
@@ -20,7 +24,33 @@ class Enemy(Character):
     }
 
     def __init__(self, profile="GRUNT"):
-        data = self.PROFILES.get(profile, self.PROFILES["GRUNT"])
+        # If profile matches a known profile, use those stats.
+        data = self.PROFILES.get(profile)
+        # Also allow overriding stats from an optional meta.json inside the enemy folder
+        # Path: assets/sprites/Enemy/<profile>/meta.json
+        meta_path = None
+        try:
+            base = os.path.join("assets", "sprites", "Enemy")
+            folder = os.path.join(base, profile)
+            meta_path = os.path.join(folder, "meta.json")
+            if os.path.isfile(meta_path):
+                import json
+                with open(meta_path, "r", encoding="utf-8") as fh:
+                    meta = json.load(fh)
+                # merge meta into data (meta values override)
+                if data is None:
+                    data = {}
+                data.update({k: meta[k] for k in ("hp", "atk", "defense") if k in meta})
+                # allow renaming
+                if "name" in meta:
+                    profile = meta["name"]
+        except Exception:
+            pass
+
+        if data is None:
+            # Unknown profile (likely a folder name). Use sensible defaults.
+            data = {"hp": 22, "atk": 5, "defense": 1, "sprite": None}
+
         super().__init__(
             name=profile,
             hp=data["hp"],
@@ -28,3 +58,45 @@ class Enemy(Character):
             defense=data["defense"],
         )
         self.profile = profile
+
+        # Try to load animations from assets/sprites/Enemy/<profile>/
+        try:
+            base = os.path.join("assets", "sprites", "Enemy")
+            path = os.path.join(base, profile)
+            animations = {}
+            if os.path.isdir(path):
+                animations = load_animations_from_folders(path, scale=1, colorkey=(0, 0, 0), target_size=(160, 160))
+
+            # If found, flip frames horizontally (enemies face left)
+            if animations:
+                for k, frames in animations.items():
+                    for i, f in enumerate(frames):
+                        try:
+                            animations[k][i] = pygame.transform.flip(f, True, False)
+                        except Exception:
+                            pass
+
+        except Exception:
+            animations = {}
+
+        if not animations:
+            # fallback placeholder
+            s = pygame.Surface((160, 160), pygame.SRCALPHA)
+            s.fill((80, 80, 80, 255))
+            animations = {"idle": [s]}
+
+        self.animator = SpriteAnimator(animations, default="idle", fps=12, return_to_idle=True)
+
+    def play(self, action):
+        action = action if action in self.animator.animations else "idle"
+        loop = (action == "idle")
+        self.animator.play(action, loop=loop, reset=True)
+
+    def update(self, dt):
+        self.animator.update(dt)
+
+    def draw(self, screen, base_pos):
+        img = self.animator.get_image()
+        from core.sprite_animator import draw as draw_sprite
+
+        draw_sprite(screen, img, base_pos)
