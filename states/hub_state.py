@@ -6,7 +6,7 @@ WHITE = (255, 255, 255)
 GRAY  = (100, 100, 100)
 BLACK = (0,   0,   0)
 
-MENU_ITEMS = ["BATALHA", "SAIR"]
+MENU_ITEMS = ["BATALHA", "TROCAR PERSONAGEM", "SAIR"]
 
 
 class HubState(BaseState):
@@ -52,9 +52,26 @@ class HubState(BaseState):
         if choice == "BATALHA":
             import random
             import os
-            from entities.enemy import Enemy
             from states.battle_state import BattleState
 
+            if getattr(self.game, 'completed', False):
+                # Modo livre: luta aleatoria contra qualquer chefe
+                from entities.boss import Boss
+                boss_base = os.path.join("assets", "sprites", "Bosses")
+                all_bosses = []
+                try:
+                    all_bosses = [f for f in os.listdir(boss_base)
+                                  if os.path.isdir(os.path.join(boss_base, f))]
+                except Exception:
+                    pass
+                if all_bosses:
+                    folder = random.choice(all_bosses)
+                    boss = Boss(folder)
+                    self.game.player.reset_for_battle()
+                    self.game.state_manager.change(BattleState(self.game, self.game.player, boss))
+                return
+
+            from entities.enemy import Enemy
             # Fresh run — reset enemy progression and player level
             self.game.defeated_enemies = []
             self.game.enemy_round = 0
@@ -84,6 +101,10 @@ class HubState(BaseState):
             enemy = Enemy(profile)
             self.game.player.reset_for_battle()
             self.game.state_manager.change(BattleState(self.game, self.game.player, enemy))
+        elif choice == "TROCAR PERSONAGEM":
+            from states.select_state import SelectState
+            name = getattr(self.game, 'player_name', None) or getattr(self.game.player, 'name', 'JOGADOR')
+            self.game.state_manager.change(SelectState(self.game, name))
         elif choice == "SAIR":
             self.game.quit()
 
@@ -102,7 +123,10 @@ class HubState(BaseState):
         )
         screen.blit(welcome, (W // 2 - welcome.get_width() // 2, 60))
 
-        sub = font_small.render("Escolha sua proxima acao.", True, GRAY)
+        sub_txt = ("MODO LIVRE — enfrente qualquer chefe!"
+                   if getattr(self.game, 'completed', False)
+                   else "Escolha sua proxima acao.")
+        sub = font_small.render(sub_txt, True, GRAY)
         screen.blit(sub, (W // 2 - sub.get_width() // 2, 100))
 
         # Buttons

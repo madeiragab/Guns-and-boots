@@ -20,6 +20,9 @@ class StateManager:
             self._stack.pop()
         self._stack.append(new_state)
         new_state.on_enter()
+        game = getattr(new_state, "game", None)
+        if game is not None and hasattr(game, "on_state_changed"):
+            game.on_state_changed(new_state)
 
     def push(self, new_state):
         """Push a new state on top (current state is paused, not destroyed)."""
@@ -27,6 +30,9 @@ class StateManager:
             self._stack[-1].on_pause()
         self._stack.append(new_state)
         new_state.on_enter()
+        game = getattr(new_state, "game", None)
+        if game is not None and hasattr(game, "on_state_changed"):
+            game.on_state_changed(new_state)
 
     def pop(self):
         """Remove the top state and resume the one below."""
@@ -35,6 +41,10 @@ class StateManager:
             self._stack.pop()
         if self._stack:
             self._stack[-1].on_resume()
+            resumed = self._stack[-1]
+            game = getattr(resumed, "game", None)
+            if game is not None and hasattr(game, "on_state_changed"):
+                game.on_state_changed(resumed)
 
     # ------------------------------------------------------------------
     # Forwarded calls

@@ -182,6 +182,10 @@ class BattleState(BaseState):
 
         # For shoot/special, spawn a projectile first, then resolve on hit
         if action in ("shoot", "special"):
+            if action == "special":
+                self.game.play_special_sfx()
+            else:
+                self.game.play_bullet_sfx()
             bullet_frames = (self.player.special_bullet_frames
                              if action == "special"
                              else self.player.bullet_frames)
@@ -246,6 +250,10 @@ class BattleState(BaseState):
             pass
 
         if action in ("shoot", "special"):
+            if action == "special":
+                self.game.play_special_sfx()
+            else:
+                self.game.play_bullet_sfx()
             bullet_frames = (self.enemy.special_bullet_frames
                              if action == "special"
                              else self.enemy.bullet_frames)

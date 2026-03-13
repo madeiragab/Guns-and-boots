@@ -26,6 +26,7 @@ class ResultState(BaseState):
         self.is_boss = is_boss
         self._all_cleared = False
         self._boss_victory = False
+        self._all_bosses_cleared = False
 
     def on_enter(self):
         self._blink_timer   = 0.0
@@ -41,6 +42,7 @@ class ResultState(BaseState):
                     self.game.unlocked_players.append(self.enemy_profile)
                 if self.enemy_profile and self.enemy_profile not in self.game.defeated_bosses:
                     self.game.defeated_bosses.append(self.enemy_profile)
+                self._all_bosses_cleared = not self._get_undefeated_bosses()
                 self.game.save_game()
                 self._boss_victory = True
             else:
@@ -81,8 +83,12 @@ class ResultState(BaseState):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     if self._boss_victory:
-                        from states.hub_state import HubState
-                        self.game.state_manager.change(HubState(self.game))
+                        if self._all_bosses_cleared and not getattr(self.game, 'completed', False):
+                            from states.credits_state import CreditsState
+                            self.game.state_manager.change(CreditsState(self.game))
+                        else:
+                            from states.hub_state import HubState
+                            self.game.state_manager.change(HubState(self.game))
                     elif self.outcome == "win" and self._all_cleared:
                         if self._get_undefeated_bosses():
                             self.game.player.level_up()
@@ -171,9 +177,16 @@ class ResultState(BaseState):
         if self.outcome == "win":
             color = GREEN
             if self._boss_victory:
-                text = "CHEFE DERROTADO"
-                flavour = f"{self.enemy_profile} DESBLOQUEADO!"
-                prompt_txt = "ENTER \u2192 menu     ESC \u2192 sair"
+                if self._all_bosses_cleared and not getattr(self.game, 'completed', False):
+                    text = "VITORIA FINAL"
+                    flavour = "Todos os chefes derrotados!"
+                    prompt_txt = "ENTER \u2192 creditos     ESC \u2192 sair"
+                else:
+                    text = "CHEFE DERROTADO"
+                    flavour = (f"{self.enemy_profile} DERROTADO!"
+                               if getattr(self.game, 'completed', False)
+                               else f"{self.enemy_profile} DESBLOQUEADO!")
+                    prompt_txt = "ENTER \u2192 menu     ESC \u2192 sair"
             elif self._all_cleared:
                 if self._get_undefeated_bosses():
                     text = "TUDO LIMPO"

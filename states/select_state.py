@@ -94,7 +94,9 @@ class SelectState(BaseState):
         chosen = self._characters[self._selected]
         from entities.player import Player
         from states.hub_state import HubState
+        self.game.player_name = self.player_name
         self.game.player = Player(self.player_name, folder=chosen["folder"])
+        self.game.save_game()
         self.game.state_manager.change(HubState(self.game))
 
     # ------------------------------------------------------------------
