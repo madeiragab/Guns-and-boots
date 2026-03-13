@@ -2,10 +2,12 @@
   "unlocked_players": [
     "Player 1",
     "guel",
+    "Caruzo",
     "Eliandro"
   ],
   "defeated_bosses": [
     "guel",
+    "Caruzo",
     "Eliandro"
   ],
   "defeated_enemies": [
@@ -13,7 +15,7 @@
     "Robot",
     "Robot Zombie"
   ],
-  "enemy_round": 2,
-  "player_name": "DAROSA",
+  "enemy_round": 0,
+  "player_name": "PABLIN",
   "completed": false
 }

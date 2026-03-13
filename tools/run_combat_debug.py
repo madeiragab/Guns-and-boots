@@ -1,10 +1,16 @@
 """Run quick, headless combat simulations to inspect HP transitions.
 
-Usage:
-    python run_combat_debug.py
-
-This will run a few example turns and print resolve_action logs to stdout.
+Usage (from project root):
+    python tools/run_combat_debug.py
 """
+import sys
+import os
+
+# Ensure project root is on sys.path and CWD is root
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
+os.chdir(ROOT)
+
 from entities.enemy import Enemy
 from entities.character import Character
 from systems.combat import resolve_action
@@ -30,11 +36,11 @@ def quick_demo():
         print(l)
     print(f"After enemy action: Player HP = {p.hp}")
 
-    # Player overcharges
-    logs = resolve_action(p, e, "overcharge")
+    # Player uses special
+    logs = resolve_action(p, e, "special")
     for l in logs:
         print(l)
-    print(f"After overcharge: Enemy HP = {e.hp}")
+    print(f"After special: Enemy HP = {e.hp}")
 
 
 if __name__ == "__main__":

@@ -1,171 +1,179 @@
 # Guns and Boots
 
-Jogo tático 2D por turnos com estética retro-futurista, desenvolvido em Python com Pygame.
+A retro-futuristic 2D turn-based game built with Python and Pygame.
 
-**Feito por Gabriel Madeira**
+**Made by Gabriel Madeira**
 
-> Projeto desenvolvido para a disciplina de **Tópicos Especiais** do curso de **Ciência da Computação** do **IFSulDeMinas**.
+> Project developed for the **Special Topics** course in the **Computer Science** program at **IFSulDeMinas**.
 
 ---
 
-## Requisitos
+## Requirements
 
-```
+```bash
 pip install pygame
 ```
 
-## Como rodar
+## How To Run
 
-```
+```bash
 python main.py
 ```
 
----
+Install dependencies from the project file:
 
-## Controles
-
-| Tecla       | Ação                          |
-|-------------|-------------------------------|
-| ↑ / ↓       | Navegar menus                 |
-| ← / →       | Navegar seleção de personagem |
-| ENTER       | Confirmar                     |
-| ESC         | Voltar / Sair                 |
-
----
-
-## Fluxo do jogo
-
+```bash
+pip install -r requirements.txt
 ```
-Título
-  ├── (sem save) → Digitar nome → Escolher personagem → Hub
-  └── (com save) → CONTINUAR (nome salvo) ou NOVO JOGO
+
+---
+
+## Controls
+
+| Key | Action |
+|---|---|
+| Up / Down | Navigate menus |
+| Left / Right | Navigate character selection |
+| Enter | Confirm |
+| Esc | Back / Quit |
+
+---
+
+## Game Flow
+
+```text
+Title Screen
+  |- (no save) -> Enter name -> Choose character -> Hub
+  '- (with save) -> CONTINUE (saved name) or NEW GAME
 
 Hub
-  ├── BATALHA        → enfrenta inimigos comuns em sequência
-  ├── TROCAR PERSONAGEM → volta para seleção de personagem
-  └── SAIR
+  |- BATTLE -> fight regular enemies in sequence
+  |- CHANGE CHARACTER -> return to character selection
+  '- EXIT
 
-Batalha vs inimigos → Resultado → próximo inimigo
-  └── todos derrotados → tela PERIGO → Batalha vs Chefe
+Battle vs Enemies -> Result -> next enemy
+  '- all defeated -> DANGER screen -> Boss Battle
 
-Batalha vs Chefe → Resultado
-  └── todos os chefes derrotados → Créditos → Título (modo livre salvo)
+Boss Battle -> Result
+  '- all bosses defeated -> Credits -> Title Screen (free mode saved)
 
-Modo Livre (após zerar):
-  └── Hub → BATALHA sorteia chefe aleatório indefinidamente
+Free Mode (after finishing the game)
+  '- Hub -> BATTLE selects a random boss indefinitely
 ```
 
 ---
 
-## Sistemas
+## Systems
 
 ### State Machine (`core/state_manager.py`)
-Gerencia todas as telas como estados empilháveis. Suporta `change` (troca), `push` (empilha) e `pop` (desempilha). A cada transição, notifica o objeto `Game` para trocar a trilha sonora automaticamente.
+Handles all screens as stackable states. Supports `change`, `push`, and `pop`. Every state transition notifies the `Game` object so the soundtrack can be updated automatically.
 
 ### Save System (`core/game.py`)
-Salva e carrega progresso em `save.json`:
-- Nome do jogador
-- Personagens desbloqueados
-- Chefes derrotados
-- Round de inimigos
-- Flag `completed` (jogo zerado)
+Saves and loads progress through `save.json`:
+- Player name
+- Unlocked characters
+- Defeated bosses
+- Enemy round progression
+- `completed` flag for post-game mode
 
-Ao zerar, o save é **mantido** com `completed = True` e todos os personagens desbloqueados. O save só é **apagado** se o jogador escolher "NOVO JOGO" na tela de título.
+After finishing the game, the save is kept with `completed = True` and all characters unlocked. The save is deleted only if the player chooses `NEW GAME` on the title screen.
 
-### Sistema de Combate (`systems/combat.py`)
-Combate por turnos com as ações:
+### Combat System (`systems/combat.py`)
+Turn-based combat with the following actions:
 
-| Ação        | Efeito                                           | Calor |
-|-------------|--------------------------------------------------|-------|
-| ATIRAR      | `atk + rand(-1,2) - def` do inimigo              | +2    |
-| COBERTURA   | Reduz dano recebido; chance de acerto cai 50%    | -3    |
-| ESPECIAL    | `(atk + rand(2,5) - def) × 2`                   | +4    |
-| MEDKIT      | Recupera HP (1 uso por batalha)                  |  0    |
+| Action | Effect | Heat |
+|---|---|---:|
+| SHOOT | `atk + rand(-1,2) - enemy def` | +2 |
+| COVER | Reduces incoming damage and lowers hit chance against the defender | -3 |
+| SPECIAL | `(atk + rand(2,5) - def) * 2` | +4 |
+| MEDKIT | Restores HP (1 use per battle) | 0 |
 
-**Sistema de Calor / Jam:** calor ≥ 8 gera chance de a arma travar (10% no 8, +15% por ponto acima). Cobertura resfria a arma.
+**Heat / Jam System:** when heat is `>= 8`, the weapon can jam. Cover helps cool the weapon down.
 
-### IA dos Inimigos (`systems/ai.py`)
-IA baseada em regras que considera:
-- HP atual → cura se < 30%
-- Calor da arma → cobertura se superaquecida
-- Tipo (Chefe vs normal) → chefes usam especial com mais frequência
+### Enemy AI (`systems/ai.py`)
+Rule-based AI that considers:
+- Current HP -> heals when badly wounded
+- Weapon heat -> uses cover when overheated
+- Enemy type -> bosses use specials more aggressively
 
-### Sprite Animator (`core/sprite_animator.py` e `ui/sprite_loader.py`)
-Carrega frames PNG de subpastas (idle, shoot, cover, damage, medkit, special/anim) e anima em loop ou one-shot com retorno automático ao idle. Suporta escala, colorkey e FPS configurável.
+### Sprite Animator (`core/sprite_animator.py` and `ui/sprite_loader.py`)
+Loads PNG frames from subfolders such as `idle`, `shoot`, `cover`, `damage`, `medkit`, and `special/anim`. Supports looping and one-shot animations with automatic return to idle, plus scaling, colorkey, and configurable FPS.
 
-### Projetil (`entities/projectile.py`)
-Projetis voam do atirador ao alvo em tempo real (0.35s). O dano só é resolvido ao atingir o alvo via callback `on_hit`, separando a animação visual da lógica de combate.
+### Projectile System (`entities/projectile.py`)
+Projectiles travel from attacker to target in real time (`0.35s`). Damage is only resolved when the projectile reaches the target through the `on_hit` callback.
 
-### Sistema de Áudio (`core/game.py`)
-Gerenciado centralmente pelo objeto `Game`:
-- **theme.mp3** → toca em loop no Título e Créditos
-- **battle music1/2.mp3** → escolhida aleatoriamente a cada batalha
-- **bullet.mp3** → SFX de tiro normal
-- **special.mp3** → SFX de habilidade especial
+### Audio System (`core/game.py`)
+Managed centrally by the `Game` object:
+- `theme.mp3` -> loops on the title screen and credits
+- `battle music1.mp3` / `battle music2.mp3` -> chosen randomly for battles
+- `bullet.mp3` -> normal shot SFX
+- `special.mp3` -> special ability SFX
 
-### Personagens e Chefes
-Carregados dinamicamente das pastas `assets/sprites/Players/` e `assets/sprites/Bosses/`. Cada pasta de personagem contém subpastas de animação. Novos personagens são adicionados só criando a pasta — nenhuma alteração de código necessária.
+### Characters And Bosses
+Loaded dynamically from `assets/sprites/Players/` and `assets/sprites/Bosses/`. Each character folder contains its own animation subfolders. New characters can be added by creating a new folder, without code changes.
 
-Chefes derrotados são desbloqueados como personagens jogáveis.
-
----
-
-## Estrutura do projeto
-
-```
-main.py
-core/
-    game.py              – janela, loop principal (60 FPS), áudio, save
-    state_manager.py     – máquina de estados push/pop/change
-    sprite_animator.py   – animador de sprites por frames
-    state_manager.py     – gerenciador de estados
-entities/
-    character.py         – stats base, calor, jam, cobertura
-    player.py            – personagem controlado pelo jogador
-    enemy.py             – inimigos comuns (carregados de pasta)
-    boss.py              – chefes (carregados de pasta)
-    projectile.py        – projetil animado com callback on_hit
-states/
-    base_state.py        – classe base dos estados
-    title_state.py       – Título (com menu continuar/novo jogo)
-    name_state.py        – Digitar nome
-    select_state.py      – Seleção de personagem
-    hub_state.py         – Menu principal / hub
-    battle_state.py      – Batalha por turnos
-    danger_state.py      – Tela de transição para chefe
-    result_state.py      – Resultado da batalha
-    credits_state.py     – Créditos finais
-systems/
-    combat.py            – resolve_action(), hit chance, dano
-    ai.py                – IA rule-based dos inimigos
-ui/
-    button.py            – botão navegável
-    healthbar.py         – barra de HP com cor dinâmica
-    logbox.py            – log de combate
-    sprite_loader.py     – carregador/animador de sprites para UI
-assets/
-    fonts/
-    sfx/
-        theme.mp3
-        battle music1.mp3
-        battle music2.mp3
-        bullet.mp3
-        special.mp3
-    sprites/
-        Players/         – personagens jogáveis (pasta por personagem)
-        Bosses/          – chefes (pasta por chefe)
-        Enemy/           – inimigos comuns (pasta por tipo)
-        field/           – fundos de batalha (escolhido aleatoriamente)
-        bullet/          – frames do projetil padrão
-```
+Defeated bosses are unlocked as playable characters.
 
 ---
 
-## Agradecimentos
+## Project Structure
 
-ChatGPT, Professor Ricardo, e os amigos: Caruzo, Eliandro, Guel
-
-| OVERCHARGE | atk + rand(2,5) – enemy.def               | +4   |
-| MEDKIT     | +10 HP (limited to 3 per battle)          |  0   |
-
-Heat ≥ 8 → chance of weapon jam (attack fails).
+```text
+Guns and boots/
+|- main.py                  - entry point
+|- requirements.txt         - dependencies
+|- README.md
+|- .gitignore
+|
+|- core/                    - game engine layer
+|  |- game.py               - window, main loop, audio, save system
+|  |- state_manager.py      - push/pop/change state machine
+|  '- sprite_animator.py    - frame-based sprite animator
+|
+|- entities/                - gameplay objects
+|  |- character.py          - base stats, heat, jam, cover
+|  |- player.py             - player-controlled character
+|  |- enemy.py              - regular enemies
+|  |- boss.py               - bosses
+|  '- projectile.py         - animated projectile with on_hit callback
+|
+|- states/                  - game screens / states
+|  |- base_state.py
+|  |- title_state.py        - title screen
+|  |- name_state.py         - name input
+|  |- select_state.py       - character selection
+|  |- hub_state.py          - hub / main menu
+|  |- battle_state.py       - turn-based battle
+|  |- danger_state.py       - transition before boss fight
+|  |- result_state.py       - battle result screen
+|  '- credits_state.py      - final credits screen
+|
+|- systems/                 - decoupled gameplay logic
+|  |- combat.py             - resolve_action(), hit chance, damage
+|  '- ai.py                 - rule-based enemy AI
+|
+|- ui/                      - visual UI components
+|  |- button.py
+|  |- healthbar.py
+|  |- logbox.py
+|  '- sprite_loader.py
+|
+|- assets/
+|  |- sfx/                  - music and sound effects
+|  |  |- theme.mp3
+|  |  |- battle music1.mp3
+|  |  |- battle music2.mp3
+|  |  |- bullet.mp3
+|  |  '- special.mp3
+|  '- sprites/
+|     |- Players/           - playable characters
+|     |- Bosses/            - bosses
+|     |- Enemy/             - regular enemies
+|     |- field/             - battle backgrounds
+|     '- bullet/            - default projectile frames
+|
+'- tools/                   - development scripts
+   |- run_combat_debug.py   - terminal combat simulation
+   |- run_test.py           - headless smoke test
+   '- sprite_demo.py        - interactive sprite viewer
+```
