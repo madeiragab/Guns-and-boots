@@ -4,6 +4,7 @@ import pygame
 from states.base_state import BaseState
 
 W, H = 640, 360
+MANDATORY_BOSSES = ["Pablo"]
 
 
 class DangerState(BaseState):
@@ -41,6 +42,12 @@ class DangerState(BaseState):
                     boss_folders.append(name)
         except Exception:
             pass
+
+        # Keep Pablo available in the boss pool even as the starter character.
+        for name in MANDATORY_BOSSES:
+            if name not in boss_folders:
+                boss_folders.append(name)
+
         defeated = getattr(self.game, 'defeated_bosses', [])
         return [b for b in boss_folders if b not in defeated]
 

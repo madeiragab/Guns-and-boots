@@ -10,6 +10,7 @@ ASSETS_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 SFX_PATH = os.path.join(ASSETS_PATH, "sfx")
 FPS = 60
 TITLE = "Guns and Boots"
+DEFAULT_STARTER_PLAYER = "Pablo"
 
 # Colour palette
 BLACK  = (0,   0,   0)
@@ -38,7 +39,8 @@ class Game:
         self.state_manager = StateManager()
         self.defeated_enemies = []
         self.defeated_bosses = []
-        self.unlocked_players = ["Player 1"]
+        self.defeated_final_bosses = []
+        self.unlocked_players = [DEFAULT_STARTER_PLAYER]
         self.enemy_round = 0
         self.player_name = ""
         self.completed = False
@@ -109,26 +111,46 @@ class Game:
             pass
 
     # ------------------------------------------------------------------
+    def _normalize_unlocked_players(self, players):
+        normalized = [name for name in players if name != "Player 1"]
+        if DEFAULT_STARTER_PLAYER in normalized:
+            normalized = [name for name in normalized if name != DEFAULT_STARTER_PLAYER]
+        normalized.insert(0, DEFAULT_STARTER_PLAYER)
+
+        # Keep order while removing duplicates.
+        seen = set()
+        unique = []
+        for name in normalized:
+            if name not in seen:
+                seen.add(name)
+                unique.append(name)
+        return unique
+
     def _load_save(self):
         try:
             if os.path.isfile(SAVE_PATH):
                 with open(SAVE_PATH, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                self.unlocked_players = data.get("unlocked_players", ["Player 1"])
+                self.unlocked_players = self._normalize_unlocked_players(
+                    data.get("unlocked_players", [DEFAULT_STARTER_PLAYER])
+                )
                 self.defeated_bosses = data.get("defeated_bosses", [])
+                self.defeated_final_bosses = data.get("defeated_final_bosses", [])
                 self.defeated_enemies = data.get("defeated_enemies", [])
                 self.enemy_round = data.get("enemy_round", 0)
                 self.player_name = data.get("player_name", "")
                 self.completed = data.get("completed", False)
         except Exception:
-            self.unlocked_players = ["Player 1"]
+            self.unlocked_players = [DEFAULT_STARTER_PLAYER]
             self.defeated_bosses = []
+            self.defeated_final_bosses = []
 
     def save_game(self):
         try:
             data = {
                 "unlocked_players": list(self.unlocked_players),
                 "defeated_bosses": list(self.defeated_bosses),
+                "defeated_final_bosses": list(self.defeated_final_bosses),
                 "defeated_enemies": list(self.defeated_enemies),
                 "enemy_round": self.enemy_round,
                 "player_name": self.player_name,
@@ -148,8 +170,9 @@ class Game:
                 os.remove(SAVE_PATH)
         except Exception:
             pass
-        self.unlocked_players = ["Player 1"]
+        self.unlocked_players = [DEFAULT_STARTER_PLAYER]
         self.defeated_bosses = []
+        self.defeated_final_bosses = []
         self.defeated_enemies = []
         self.enemy_round = 0
         self.player_name = ""

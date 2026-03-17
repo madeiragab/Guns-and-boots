@@ -9,6 +9,7 @@ GRAY   = (100, 100, 100)
 GREEN  = (50,  200, 80)
 RED    = (200, 40,  40)
 YELLOW = (255, 220, 50)
+MANDATORY_BOSSES = ["Pablo"]
 
 
 class ResultState(BaseState):
@@ -19,14 +20,17 @@ class ResultState(BaseState):
     On lose: returns to the hub.
     """
 
-    def __init__(self, game, outcome, enemy_profile=None, is_boss=False):
+    def __init__(self, game, outcome, enemy_profile=None, is_boss=False, is_final_boss=False):
         super().__init__(game)
         self.outcome = outcome          # "win" | "lose"
         self.enemy_profile = enemy_profile
         self.is_boss = is_boss
+        self.is_final_boss = is_final_boss
         self._all_cleared = False
         self._boss_victory = False
+        self._final_boss_victory = False
         self._all_bosses_cleared = False
+        self._all_final_bosses_cleared = False
 
     def on_enter(self):
         self._blink_timer   = 0.0
@@ -36,7 +40,13 @@ class ResultState(BaseState):
         self._accept_input = False
 
         if self.outcome == "win":
-            if self.is_boss:
+            if self.is_final_boss:
+                if self.enemy_profile and self.enemy_profile not in self.game.defeated_final_bosses:
+                    self.game.defeated_final_bosses.append(self.enemy_profile)
+                self._all_final_bosses_cleared = not self._get_undefeated_final_bosses()
+                self.game.save_game()
+                self._final_boss_victory = True
+            elif self.is_boss:
                 # Unlock the corresponding player character
                 if self.enemy_profile and self.enemy_profile not in self.game.unlocked_players:
                     self.game.unlocked_players.append(self.enemy_profile)
@@ -72,7 +82,28 @@ class ResultState(BaseState):
                     folders.append(name)
         except Exception:
             pass
+
+        for name in MANDATORY_BOSSES:
+            if name not in folders:
+                folders.append(name)
+
         defeated = getattr(self.game, 'defeated_bosses', [])
+        return [f for f in folders if f not in defeated]
+
+    def _get_undefeated_final_bosses(self):
+        base = os.path.join("assets", "sprites", "Final Bosses")
+        folders = []
+        try:
+            for name in os.listdir(base):
+                if os.path.isdir(os.path.join(base, name)):
+                    folders.append(name)
+        except Exception:
+            pass
+
+        if "Paulo" not in folders:
+            folders.append("Paulo")
+
+        defeated = getattr(self.game, 'defeated_final_bosses', [])
         return [f for f in folders if f not in defeated]
 
     # ------------------------------------------------------------------
@@ -82,10 +113,18 @@ class ResultState(BaseState):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    if self._boss_victory:
-                        if self._all_bosses_cleared and not getattr(self.game, 'completed', False):
+                    if self._final_boss_victory:
+                        if self._all_final_bosses_cleared and not getattr(self.game, 'completed', False):
+                            self.game.complete_game()
                             from states.credits_state import CreditsState
                             self.game.state_manager.change(CreditsState(self.game))
+                        else:
+                            from states.hub_state import HubState
+                            self.game.state_manager.change(HubState(self.game))
+                    elif self._boss_victory:
+                        if self._all_bosses_cleared and not getattr(self.game, 'completed', False):
+                            from states.final_danger_state import FinalDangerState
+                            self.game.state_manager.change(FinalDangerState(self.game))
                         else:
                             from states.hub_state import HubState
                             self.game.state_manager.change(HubState(self.game))
@@ -176,11 +215,20 @@ class ResultState(BaseState):
 
         if self.outcome == "win":
             color = GREEN
-            if self._boss_victory:
-                if self._all_bosses_cleared and not getattr(self.game, 'completed', False):
+            if self._final_boss_victory:
+                if self._all_final_bosses_cleared and not getattr(self.game, 'completed', False):
                     text = "VITORIA FINAL"
-                    flavour = "Todos os chefes derrotados!"
+                    flavour = "PAULO CAIU. O FIM CHEGOU."
                     prompt_txt = "ENTER \u2192 creditos     ESC \u2192 sair"
+                else:
+                    text = "BOSS FINAL DERROTADO"
+                    flavour = f"{self.enemy_profile} derrotado!"
+                    prompt_txt = "ENTER \u2192 menu     ESC \u2192 sair"
+            elif self._boss_victory:
+                if self._all_bosses_cleared and not getattr(self.game, 'completed', False):
+                    text = "ULTIMO CHEFE LIMPO"
+                    flavour = "A ameaca final apareceu..."
+                    prompt_txt = "ENTER \u2192 boss final     ESC \u2192 sair"
                 else:
                     text = "CHEFE DERROTADO"
                     flavour = (f"{self.enemy_profile} DERROTADO!"

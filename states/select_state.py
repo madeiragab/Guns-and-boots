@@ -39,7 +39,7 @@ class SelectState(BaseState):
         except Exception:
             folders = []
 
-        unlocked = getattr(self.game, 'unlocked_players', ["Player 1"])
+        unlocked = getattr(self.game, 'unlocked_players', ["Pablo"])
 
         for folder in folders:
             path = os.path.join(PLAYERS_BASE, folder)

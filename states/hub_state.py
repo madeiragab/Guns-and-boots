@@ -7,6 +7,7 @@ GRAY  = (100, 100, 100)
 BLACK = (0,   0,   0)
 
 MENU_ITEMS = ["BATALHA", "TROCAR PERSONAGEM", "SAIR"]
+MANDATORY_BOSSES = ["Pablo"]
 
 
 class HubState(BaseState):
@@ -57,16 +58,40 @@ class HubState(BaseState):
             if getattr(self.game, 'completed', False):
                 # Modo livre: luta aleatoria contra qualquer chefe
                 from entities.boss import Boss
+                from entities.final_boss import FinalBoss
                 boss_base = os.path.join("assets", "sprites", "Bosses")
+                final_boss_base = os.path.join("assets", "sprites", "Final Bosses")
                 all_bosses = []
+                all_final_bosses = []
                 try:
                     all_bosses = [f for f in os.listdir(boss_base)
                                   if os.path.isdir(os.path.join(boss_base, f))]
                 except Exception:
                     pass
-                if all_bosses:
-                    folder = random.choice(all_bosses)
-                    boss = Boss(folder)
+
+                try:
+                    all_final_bosses = [f for f in os.listdir(final_boss_base)
+                                        if os.path.isdir(os.path.join(final_boss_base, f))]
+                except Exception:
+                    pass
+
+                for name in MANDATORY_BOSSES:
+                    if name not in all_bosses:
+                        all_bosses.append(name)
+
+                if "Paulo" not in all_final_bosses:
+                    all_final_bosses.append("Paulo")
+
+                candidates = [("boss", name) for name in all_bosses] + [
+                    ("final", name) for name in all_final_bosses
+                ]
+
+                if candidates:
+                    kind, folder = random.choice(candidates)
+                    if kind == "final":
+                        boss = FinalBoss(folder, self.game.player)
+                    else:
+                        boss = Boss(folder)
                     self.game.player.reset_for_battle()
                     self.game.state_manager.change(BattleState(self.game, self.game.player, boss))
                 return

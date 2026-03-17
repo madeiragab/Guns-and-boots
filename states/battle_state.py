@@ -340,8 +340,15 @@ class BattleState(BaseState):
             if self._death_timer >= self._death_duration:
                 from states.result_state import ResultState
                 is_boss = getattr(self.enemy, '_is_boss', False)
+                is_final_boss = getattr(self.enemy, '_is_final_boss', False)
                 self.game.state_manager.change(
-                    ResultState(self.game, self._death_outcome, self.enemy.profile, is_boss=is_boss)
+                    ResultState(
+                        self.game,
+                        self._death_outcome,
+                        self.enemy.profile,
+                        is_boss=is_boss,
+                        is_final_boss=is_final_boss,
+                    )
                 )
             return
 
