@@ -12,6 +12,7 @@ from core.sprite_animator import (
 
 # Base directory containing player character sub-folders.
 PLAYERS_BASE = os.path.join("assets", "sprites", "Players")
+BOSSES_BASE = os.path.join("assets", "sprites", "Bosses")
 # Make player sprites smaller for in-game rendering (appears behind UI on left)
 TARGET_FRAME_SIZE = (160, 160)
 
@@ -23,6 +24,8 @@ class Player(Character):
         super().__init__(name=name, hp=30, atk=7, defense=2)
         self.level = 1
         self.folder = folder  # subfolder name inside Players/
+        self._in_boss_form = False
+        self._base_form_stats = None
         self._load_animations_from_folders()
         self._load_bullet_and_special()
 
@@ -73,6 +76,89 @@ class Player(Character):
                 self.special_bullet_frames = frames
         if not self.special_bullet_frames:
             self.special_bullet_frames = self.bullet_frames
+
+    def _load_boss_form_visuals(self):
+        """Swap visuals/projectiles to the matching Boss folder (left-side orientation)."""
+        if not self.folder:
+            return False
+
+        boss_base = os.path.join(BOSSES_BASE, self.folder)
+        if not os.path.isdir(boss_base):
+            return False
+
+        try:
+            animations = load_animations_from_folders(
+                boss_base, scale=1, colorkey=(0, 0, 0), target_size=TARGET_FRAME_SIZE
+            )
+        except Exception:
+            animations = {}
+
+        if not animations:
+            return False
+
+        special_anim_path = os.path.join(boss_base, "special", "anim")
+        special_frames = _load_frames_from_folder(special_anim_path, target_size=TARGET_FRAME_SIZE)
+        if special_frames:
+            animations["special"] = special_frames
+
+        self.animator = SpriteAnimator(animations, default="idle", fps=12, return_to_idle=True)
+
+        self.bullet_frames = load_bullet_frames()
+        special_bullet_path = os.path.join(boss_base, "special", "bullet")
+        sp_frames = _load_frames_from_folder(special_bullet_path, target_size=None)
+        self.special_bullet_frames = sp_frames if sp_frames else self.bullet_frames
+        return True
+
+    def activate_final_boss_form(self):
+        """One-time transform used as a second chance during final boss battles."""
+        if self._in_boss_form:
+            return False
+
+        self._base_form_stats = {
+            "max_hp": self.max_hp,
+            "atk": self.atk,
+            "defense": self.defense,
+            "medkits": self.medkits,
+        }
+
+        # Aggressive buffs so the comeback feels meaningful.
+        self.max_hp = max(int(self.max_hp * 1.6) + 20, self.max_hp + 35)
+        self.hp = self.max_hp
+        self.atk = max(self.atk + 5, int(self.atk * 1.5))
+        self.defense = max(self.defense + 2, int(self.defense * 1.4))
+        self.medkits += 1
+        self.heat = 0
+        self.cover = False
+        self.special_cooldown = 0
+
+        self._in_boss_form = True
+        self._load_boss_form_visuals()
+        try:
+            self.play("special")
+        except Exception:
+            pass
+        return True
+
+    def revert_from_boss_form(self):
+        """Restore original visuals/stats after final battle ends."""
+        if not self._in_boss_form:
+            return
+
+        stats = self._base_form_stats or {}
+        self.max_hp = stats.get("max_hp", self.max_hp)
+        self.atk = stats.get("atk", self.atk)
+        self.defense = stats.get("defense", self.defense)
+        self.medkits = stats.get("medkits", self.medkits)
+        self.hp = min(max(0, self.hp), self.max_hp)
+
+        self._base_form_stats = None
+        self._in_boss_form = False
+        self._load_animations_from_folders()
+        self._load_bullet_and_special()
+        try:
+            self.play("idle")
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     def play(self, action):

@@ -67,6 +67,10 @@ class BattleState(BaseState):
         self._selected = 0
         self._waiting = False
         self._wait_timer = 0.0
+        self._final_stand_used = False
+        self._transform_anim_active = False
+        self._transform_anim_timer = 0.0
+        self._transform_anim_duration = 1.25
         self._projectiles = []  # active projectiles on screen
 
         # Sprite positions (used for projectile start/end)
@@ -291,6 +295,9 @@ class BattleState(BaseState):
     def _after_enemy_action(self):
         """After enemy action resolves, check loss or return to player turn."""
         if not self.player.is_alive():
+            if self._try_final_stand_transformation():
+                self._turn = "transform"
+                return
             self._end_battle("lose")
             return
 
@@ -303,6 +310,34 @@ class BattleState(BaseState):
         if self._buttons[self._selected].disabled:
             self._skip_to_valid(1)
         self._update_selection()
+
+    def _try_final_stand_transformation(self):
+        """Allow one comeback only when the player dies against a final boss."""
+        is_final_boss = getattr(self.enemy, '_is_final_boss', False)
+        if self._final_stand_used or not is_final_boss:
+            return False
+
+        if not hasattr(self.player, "activate_final_boss_form"):
+            return False
+
+        activated = False
+        try:
+            activated = self.player.activate_final_boss_form()
+        except Exception:
+            activated = False
+
+        if not activated:
+            return False
+
+        self._final_stand_used = True
+        self._transform_anim_active = True
+        self._transform_anim_timer = 0.0
+        try:
+            self.game.play_special_sfx()
+        except Exception:
+            pass
+        self._log.add("DESPERTAR FINAL: voce assumiu a FORMA BOSS!")
+        return True
 
     # ------------------------------------------------------------------
     def _end_battle(self, outcome):
@@ -334,6 +369,17 @@ class BattleState(BaseState):
         for proj in self._projectiles:
             proj.update(dt)
         self._projectiles = [p for p in self._projectiles if not p.finished]
+
+        if self._transform_anim_active:
+            self._transform_anim_timer += dt
+            if self._transform_anim_timer >= self._transform_anim_duration:
+                self._transform_anim_active = False
+                self._turn = "player"
+                self._update_disabled_buttons()
+                if self._buttons[self._selected].disabled:
+                    self._skip_to_valid(1)
+                self._update_selection()
+            return
 
         if self._turn == "dying":
             self._death_timer += dt
@@ -378,6 +424,51 @@ class BattleState(BaseState):
         tinted.blit(red_overlay, (0, 0))
         tinted.set_alpha(alpha)
         return tinted
+
+    def _draw_transformation_overlay(self, screen):
+        """Draw a short, punchy screen effect while boss form activates."""
+        if not self._transform_anim_active:
+            return
+
+        progress = min(1.0, self._transform_anim_timer / self._transform_anim_duration)
+        burst = 1.0 - abs(0.5 - progress) * 2.0
+
+        # Full-screen white flash that fades quickly.
+        flash_alpha = int(max(0, 200 * (1.0 - progress * 1.35)))
+        if flash_alpha > 0:
+            flash = pygame.Surface((W, H), pygame.SRCALPHA)
+            flash.fill((255, 255, 255, flash_alpha))
+            screen.blit(flash, (0, 0))
+
+        # Pulsing red aura centered on the player.
+        aura_size = int(150 + burst * 180)
+        aura = pygame.Surface((aura_size, aura_size), pygame.SRCALPHA)
+        inner_alpha = int(120 + burst * 95)
+        pygame.draw.circle(aura, (255, 45, 45, inner_alpha), (aura_size // 2, aura_size // 2), aura_size // 2)
+        pygame.draw.circle(aura, (255, 220, 120, int(inner_alpha * 0.45)), (aura_size // 2, aura_size // 2), int(aura_size * 0.32))
+        px = self._player_pos[0]
+        py = self._player_pos[1] - 85
+        screen.blit(aura, (px - aura_size // 2, py - aura_size // 2))
+
+        # Crack-like energy lines flying out from the player.
+        line_surf = pygame.Surface((W, H), pygame.SRCALPHA)
+        line_alpha = int(80 + burst * 175)
+        for i in range(8):
+            ang = i * (3.14159 / 4.0) + progress * 2.2
+            length = int(35 + progress * 140)
+            ex = int(px + length * pygame.math.Vector2(1, 0).rotate_rad(ang).x)
+            ey = int(py + length * pygame.math.Vector2(1, 0).rotate_rad(ang).y)
+            pygame.draw.line(line_surf, (255, 245, 200, line_alpha), (px, py), (ex, ey), 2)
+        screen.blit(line_surf, (0, 0))
+
+        if 0.12 < progress < 0.92:
+            font = pygame.font.SysFont("Courier New", 28, bold=True)
+            txt = font.render("TRANSFORMACAO", True, (255, 255, 255))
+            txt_shadow = font.render("TRANSFORMACAO", True, (120, 10, 10))
+            cx = W // 2 - txt.get_width() // 2
+            cy = 36
+            screen.blit(txt_shadow, (cx + 2, cy + 2))
+            screen.blit(txt, (cx, cy))
 
     # ------------------------------------------------------------------
     def draw(self, screen):
@@ -431,12 +522,14 @@ class BattleState(BaseState):
 
         # Place HP bars: PLAYER on the left, ENEMY on the right
         try:
+            self._player_hp_bar.max_value = max(1, self.player.max_hp)
             self._player_hp_bar.rect.topleft = (ENEMY_BAR_X, ENEMY_BAR_Y)
             self._player_hp_bar.draw(screen, font_small, self.player.hp)
         except Exception:
             pass
 
         try:
+            self._enemy_hp_bar.max_value = max(1, self.enemy.max_hp)
             self._enemy_hp_bar.rect.topright = (W - 10, ENEMY_BAR_Y)
             self._enemy_hp_bar.draw(screen, font_small, self.enemy.hp)
         except Exception:
@@ -500,3 +593,5 @@ class BattleState(BaseState):
                 btn.draw(screen, pygame.font.SysFont("Courier New", 13))
         except Exception:
             pass
+
+            self._draw_transformation_overlay(screen)

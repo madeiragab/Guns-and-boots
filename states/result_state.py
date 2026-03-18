@@ -39,6 +39,13 @@ class ResultState(BaseState):
         self._fade_in_duration = 1.0  # seconds to fade in
         self._accept_input = False
 
+        # Final-stand transformation is temporary and must not leak to other battles.
+        try:
+            if getattr(self.game.player, "_in_boss_form", False):
+                self.game.player.revert_from_boss_form()
+        except Exception:
+            pass
+
         if self.outcome == "win":
             if self.is_final_boss:
                 if self.enemy_profile and self.enemy_profile not in self.game.defeated_final_bosses:
@@ -106,6 +113,39 @@ class ResultState(BaseState):
         defeated = getattr(self.game, 'defeated_final_bosses', [])
         return [f for f in folders if f not in defeated]
 
+    def _prepare_final_boss_retry(self):
+        """On final-boss defeat, force a new run: 3 enemies + 1 boss before rematch."""
+        boss_folders = []
+        base = os.path.join("assets", "sprites", "Bosses")
+        try:
+            for name in os.listdir(base):
+                if os.path.isdir(os.path.join(base, name)):
+                    boss_folders.append(name)
+        except Exception:
+            pass
+
+        for name in MANDATORY_BOSSES:
+            if name not in boss_folders:
+                boss_folders.append(name)
+
+        defeated_now = list(getattr(self.game, "defeated_bosses", []))
+        retry_candidates = [name for name in defeated_now if name in boss_folders]
+        if not retry_candidates:
+            retry_candidates = list(boss_folders)
+
+        retry_boss = random.choice(retry_candidates) if retry_candidates else None
+        if retry_boss is not None:
+            self.game.defeated_bosses = [name for name in defeated_now if name != retry_boss]
+
+        # Restart enemy progression so the player must clear enemies before boss again.
+        self.game.defeated_enemies = []
+        self.game.enemy_round = 0
+
+        # Keep campaign mode active and remember which final boss should be retried.
+        self.game.completed = False
+        self.game.final_boss_retry_target = self.enemy_profile
+        self.game.save_game()
+
     # ------------------------------------------------------------------
     def handle_events(self, events):
         if not self._accept_input:
@@ -125,6 +165,9 @@ class ResultState(BaseState):
                         if self._all_bosses_cleared and not getattr(self.game, 'completed', False):
                             from states.final_danger_state import FinalDangerState
                             self.game.state_manager.change(FinalDangerState(self.game))
+                        elif not getattr(self.game, 'completed', False):
+                            from states.danger_state import DangerState
+                            self.game.state_manager.change(DangerState(self.game))
                         else:
                             from states.hub_state import HubState
                             self.game.state_manager.change(HubState(self.game))
@@ -139,6 +182,8 @@ class ResultState(BaseState):
                     elif self.outcome == "win":
                         self._advance_to_next_battle()
                     else:
+                        if self.is_final_boss and not getattr(self.game, 'completed', False):
+                            self._prepare_final_boss_retry()
                         from states.hub_state import HubState
                         self.game.state_manager.change(HubState(self.game))
                 elif event.key == pygame.K_SPACE:
@@ -234,7 +279,10 @@ class ResultState(BaseState):
                     flavour = (f"{self.enemy_profile} DERROTADO!"
                                if getattr(self.game, 'completed', False)
                                else f"{self.enemy_profile} DESBLOQUEADO!")
-                    prompt_txt = "ENTER \u2192 menu     ESC \u2192 sair"
+                    if getattr(self.game, 'completed', False):
+                        prompt_txt = "ENTER \u2192 menu     ESC \u2192 sair"
+                    else:
+                        prompt_txt = "ENTER \u2192 proximo chefe     ESC \u2192 sair"
             elif self._all_cleared:
                 if self._get_undefeated_bosses():
                     text = "TUDO LIMPO"

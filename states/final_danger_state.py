@@ -109,11 +109,19 @@ class FinalDangerState(BaseState):
 
         available = self._get_undefeated_final_bosses()
         if not available:
+            if hasattr(self.game, "final_boss_retry_target"):
+                self.game.final_boss_retry_target = None
             self.game.complete_game()
             self.game.state_manager.change(CreditsState(self.game))
             return
 
-        folder = random.choice(available)
+        retry_target = getattr(self.game, "final_boss_retry_target", None)
+        if retry_target in available:
+            folder = retry_target
+        else:
+            folder = random.choice(available)
+
+        self.game.final_boss_retry_target = None
         final_boss = FinalBoss(folder, self.game.player)
         self.game.player.reset_for_battle()
         self.game.state_manager.change(BattleState(self.game, self.game.player, final_boss))
