@@ -68,6 +68,9 @@ class BattleState(BaseState):
         self._waiting = False
         self._wait_timer = 0.0
         self._final_stand_used = False
+        self._final_stand_warning_active = False
+        self._final_stand_warning_timer = 0.0
+        self._final_stand_warning_duration = 1.8
         self._transform_anim_active = False
         self._transform_anim_timer = 0.0
         self._transform_anim_duration = 1.25
@@ -320,23 +323,10 @@ class BattleState(BaseState):
         if not hasattr(self.player, "activate_final_boss_form"):
             return False
 
-        activated = False
-        try:
-            activated = self.player.activate_final_boss_form()
-        except Exception:
-            activated = False
-
-        if not activated:
-            return False
-
+        # Don't transform immediately; start the warning phase
         self._final_stand_used = True
-        self._transform_anim_active = True
-        self._transform_anim_timer = 0.0
-        try:
-            self.game.play_special_sfx()
-        except Exception:
-            pass
-        self._log.add("DESPERTAR FINAL: voce assumiu a FORMA BOSS!")
+        self._final_stand_warning_active = True
+        self._final_stand_warning_timer = 0.0
         return True
 
     # ------------------------------------------------------------------
@@ -369,6 +359,13 @@ class BattleState(BaseState):
         for proj in self._projectiles:
             proj.update(dt)
         self._projectiles = [p for p in self._projectiles if not p.finished]
+
+        if self._final_stand_warning_active:
+            self._final_stand_warning_timer += dt
+            if self._final_stand_warning_timer >= self._final_stand_warning_duration:
+                self._final_stand_warning_active = False
+                self._begin_final_stand_transformation()
+            return
 
         if self._transform_anim_active:
             self._transform_anim_timer += dt
@@ -416,6 +413,26 @@ class BattleState(BaseState):
         alpha = max(0, int(255 * (1.0 - progress)))
         return True, alpha
 
+    def _begin_final_stand_transformation(self):
+        """Actually activate the transformation after warning phase ends."""
+        activated = False
+        try:
+            activated = self.player.activate_final_boss_form()
+        except Exception:
+            activated = False
+
+        if not activated:
+            self._end_battle("lose")
+            return
+
+        self._transform_anim_active = True
+        self._transform_anim_timer = 0.0
+        try:
+            self.game.play_special_sfx()
+        except Exception:
+            pass
+        self._log.add("DESPERTAR FINAL: voce assumiu a FORMA BOSS!")
+
     def _tint_red_and_fade(self, img, alpha):
         """Return a copy of img tinted red with given alpha."""
         tinted = img.copy()
@@ -425,43 +442,85 @@ class BattleState(BaseState):
         tinted.set_alpha(alpha)
         return tinted
 
+    def _tint_transform_color(self, img, progress):
+        """Apply golden→white→normal tint to sprite during transformation."""
+        tinted = img.copy()
+        
+        if progress < 0.35:
+            ratio = progress / 0.35
+            r = int(255)
+            g = int(200 + 55 * ratio)
+            b = int(0 + 55 * ratio)
+            alpha = int(140 + 80 * ratio)
+        elif progress < 0.7:
+            ratio = (progress - 0.35) / 0.35
+            r = int(255)
+            g = int(255)
+            b = int(55 + 200 * ratio)
+            alpha = int(220 - 60 * ratio)
+        else:
+            ratio = (progress - 0.7) / 0.3
+            r = int(255 - 60 * ratio)
+            g = int(255 - 100 * ratio)
+            b = int(255 - 180 * ratio)
+            alpha = int(160 * (1.0 - ratio))
+        
+        color_overlay = pygame.Surface(tinted.get_size(), pygame.SRCALPHA)
+        color_overlay.fill((r, g, b, alpha))
+        tinted.blit(color_overlay, (0, 0))
+        return tinted
+
+    def _draw_final_stand_warning(self, screen):
+        """Draw screen flashing effect with 'ainda não é o fim' message."""
+        if not self._final_stand_warning_active:
+            return
+
+        progress = min(1.0, self._final_stand_warning_timer / self._final_stand_warning_duration)
+        
+        # Intense blinking effect (faster pulses)
+        blink_cycle = (self._final_stand_warning_timer * 8) % 1.0
+        flash_visible = blink_cycle < 0.5
+        
+        if flash_visible:
+            flash = pygame.Surface((W, H), pygame.SRCALPHA)
+            flash_alpha = int(220 * (0.5 + progress * 0.5))
+            flash.fill((255, 50, 50, flash_alpha))
+            screen.blit(flash, (0, 0))
+        
+        # Message appears mid-way through the warning phase
+        if progress > 0.25:
+            msg_alpha = int(255 * min(1.0, (progress - 0.25) / 0.25))
+            font = pygame.font.SysFont("Courier New", 36, bold=True)
+            txt = font.render("AINDA NAO E O FIM", True, (255, 100, 100))
+            txt_shadow = font.render("AINDA NAO E O FIM", True, (80, 20, 20))
+            
+            cx = W // 2 - txt.get_width() // 2
+            cy = H // 2 - txt.get_height() // 2
+            
+            txt_shadow.set_alpha(msg_alpha)
+            txt.set_alpha(msg_alpha)
+            screen.blit(txt_shadow, (cx + 3, cy + 3))
+            screen.blit(txt, (cx, cy))
+
     def _draw_transformation_overlay(self, screen):
-        """Draw a short, punchy screen effect while boss form activates."""
+        """Draw transformation animation: golden→white tint on player sprite."""
         if not self._transform_anim_active:
             return
 
         progress = min(1.0, self._transform_anim_timer / self._transform_anim_duration)
-        burst = 1.0 - abs(0.5 - progress) * 2.0
 
-        # Full-screen white flash that fades quickly.
-        flash_alpha = int(max(0, 200 * (1.0 - progress * 1.35)))
-        if flash_alpha > 0:
-            flash = pygame.Surface((W, H), pygame.SRCALPHA)
-            flash.fill((255, 255, 255, flash_alpha))
-            screen.blit(flash, (0, 0))
+        try:
+            px = 80
+            py = H - 10
+            img = self.player.animator.get_image()
+            if img:
+                tinted = self._tint_transform_color(img, progress)
+                rect = tinted.get_rect(midbottom=(px, py))
+                screen.blit(tinted, rect)
+        except Exception:
+            pass
 
-        # Pulsing red aura centered on the player.
-        aura_size = int(150 + burst * 180)
-        aura = pygame.Surface((aura_size, aura_size), pygame.SRCALPHA)
-        inner_alpha = int(120 + burst * 95)
-        pygame.draw.circle(aura, (255, 45, 45, inner_alpha), (aura_size // 2, aura_size // 2), aura_size // 2)
-        pygame.draw.circle(aura, (255, 220, 120, int(inner_alpha * 0.45)), (aura_size // 2, aura_size // 2), int(aura_size * 0.32))
-        px = self._player_pos[0]
-        py = self._player_pos[1] - 85
-        screen.blit(aura, (px - aura_size // 2, py - aura_size // 2))
-
-        # Crack-like energy lines flying out from the player.
-        line_surf = pygame.Surface((W, H), pygame.SRCALPHA)
-        line_alpha = int(80 + burst * 175)
-        for i in range(8):
-            ang = i * (3.14159 / 4.0) + progress * 2.2
-            length = int(35 + progress * 140)
-            ex = int(px + length * pygame.math.Vector2(1, 0).rotate_rad(ang).x)
-            ey = int(py + length * pygame.math.Vector2(1, 0).rotate_rad(ang).y)
-            pygame.draw.line(line_surf, (255, 245, 200, line_alpha), (px, py), (ex, ey), 2)
-        screen.blit(line_surf, (0, 0))
-
-        if 0.12 < progress < 0.92:
+        if 0.2 < progress < 0.85:
             font = pygame.font.SysFont("Courier New", 28, bold=True)
             txt = font.render("TRANSFORMACAO", True, (255, 255, 255))
             txt_shadow = font.render("TRANSFORMACAO", True, (120, 10, 10))
@@ -500,13 +559,15 @@ class BattleState(BaseState):
             except Exception:
                 img = None
 
-            # draw sprite (uses midbottom anchoring)
-            if img is not None and player_dying:
-                tinted = self._tint_red_and_fade(img, death_alpha)
-                rect = tinted.get_rect(midbottom=(px, py))
-                screen.blit(tinted, rect)
-            else:
-                self.player.draw(screen, (px, py))
+            # Skip normal draw if transformation animation is active (will draw transformed version)
+            if not self._transform_anim_active:
+                # draw sprite (uses midbottom anchoring)
+                if img is not None and player_dying:
+                    tinted = self._tint_red_and_fade(img, death_alpha)
+                    rect = tinted.get_rect(midbottom=(px, py))
+                    screen.blit(tinted, rect)
+                else:
+                    self.player.draw(screen, (px, py))
 
             # draw name + level above sprite
             if img is not None:
@@ -594,4 +655,5 @@ class BattleState(BaseState):
         except Exception:
             pass
 
-            self._draw_transformation_overlay(screen)
+        self._draw_final_stand_warning(screen)
+        self._draw_transformation_overlay(screen)
