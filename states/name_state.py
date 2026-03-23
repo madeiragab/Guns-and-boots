@@ -30,7 +30,7 @@ class NameInputState(BaseState):
                     if not name:
                         self._error = "O nome nao pode estar vazio."
                         return
-                    # Go to character selection
+                    # Vai para a selecao de personagem
                     from states.select_state import SelectState
                     self.game.state_manager.change(SelectState(self.game, name.upper()))
 
@@ -63,7 +63,7 @@ class NameInputState(BaseState):
         title = font_title.render("DIGITE SEU NOME", True, WHITE)
         screen.blit(title, (W // 2 - title.get_width() // 2, H // 4))
 
-        # Input box
+        # Caixa de entrada
         box_w, box_h = 280, 32
         box_x = W // 2 - box_w // 2
         box_y = H // 2 - box_h // 2
@@ -74,12 +74,12 @@ class NameInputState(BaseState):
         display = font.render(self._name + cursor, True, WHITE)
         screen.blit(display, (box_x + 8, box_y + 6))
 
-        # Error
+        # Erro
         if self._error:
             err = font.render(self._error, True, RED)
             screen.blit(err, (W // 2 - err.get_width() // 2, box_y + box_h + 10))
 
-        # Hints
+        # Dicas
         hint = pygame.font.SysFont("Courier New", 13).render(
             "ENTER confirmar     ESC voltar", True, GRAY
         )

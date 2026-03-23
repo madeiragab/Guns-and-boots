@@ -1,0 +1,67 @@
+## 🎮 Guns and Boots - Guia de Build do Executável
+
+### Como Compilar o Jogo em EXE
+
+**Método rápido (recomendado):**
+1. Duplo-clique em `build.bat` na pasta raiz
+2. Aguarde a compilação terminar
+3. O executável estará em `build_output/dist/`
+
+**Método manual:**
+```cmd
+python build.py
+```
+
+### Jogando o Jogo Compilado
+
+Após a compilação:
+- Abra `build_output/Jogar.bat` para iniciar o jogo
+- Ou execute `build_output/dist/Guns and Boots.exe` diretamente
+
+### O que o Build Faz
+
+- ✅ Compila o código Python em nativo (.exe)
+- ✅ Copia todos os assets (sprites, fonts, sfx)
+- ✅ Copia o arquivo de save (save.json)
+- ✅ Cria um launcher .bat para facilitar
+- ✅ Tudo fica em uma pasta `build_output` isolada
+
+### Estrutura do Build
+
+```
+build_output/
+├── dist/
+│   ├── Guns and Boots.exe  ← Executável do jogo
+│   ├── assets/             ← Sprites, fonts, sons
+│   └── save.json           ← Save do jogo
+├── Jogar.bat               ← Atalho para rodar
+└── README.txt              ← Instruções
+```
+
+### Atualizando o Executável
+
+Para atualizar o jogo com as mudanças mais recentes:
+1. Faça as alterações no código
+2. Duplo-clique em `build.bat`
+3. Pronto! O exe está atualizado em `build_output/`
+
+### Requisitos
+
+- Python 3.7+
+- pygame
+- PyInstaller (instalado automaticamente pelo script)
+
+### Problemas Comuns
+
+**"Python não foi encontrado"**
+- Instale Python de python.org
+- Na instalação, marque "Add Python to PATH"
+
+**"ModuleNotFoundError: No module named 'pygame'"**
+```cmd
+pip install pygame
+```
+
+**"Erro na compilação"**
+- Verifique se todos os arquivos de código estão presentes
+- Verifique se a pasta `assets/` existe

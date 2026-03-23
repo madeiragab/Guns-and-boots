@@ -2,7 +2,7 @@ import os
 import pygame
 from core.sprite_animator import SpriteAnimator
 
-# Shared default bullet path
+# Caminho padrao compartilhado do projetil
 DEFAULT_BULLET_PATH = os.path.join("assets", "sprites", "bullet")
 BULLET_SIZE = (32, 32)
 
@@ -35,7 +35,7 @@ def _load_frames_from_folder(folder, target_size=BULLET_SIZE, colorkey=(0, 0, 0)
         if img.get_alpha() is None and colorkey is not None:
             img.set_colorkey(colorkey)
 
-        # Scale to target size
+        # Redimensiona para o tamanho alvo
         if target_size:
             tw, th = target_size
             try:
@@ -55,7 +55,7 @@ def load_bullet_frames(folder=None, flip=False, target_size=BULLET_SIZE):
     if not frames:
         frames = _load_frames_from_folder(DEFAULT_BULLET_PATH, target_size=target_size)
     if not frames:
-        # Ultimate fallback: yellow square
+        # Reserva final: quadrado amarelo
         s = pygame.Surface(BULLET_SIZE, pygame.SRCALPHA)
         s.fill((255, 220, 50, 255))
         frames = [s]
@@ -75,7 +75,7 @@ class Projectile:
         self.duration = max(0.05, duration)
         self.timer = 0.0
         self.finished = False
-        self.on_hit = on_hit  # callback when projectile arrives
+        self.on_hit = on_hit  # retorno quando o projetil chega
 
     @property
     def x(self):

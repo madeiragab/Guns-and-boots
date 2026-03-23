@@ -12,7 +12,7 @@ FPS = 60
 TITLE = "Guns and Boots"
 DEFAULT_STARTER_PLAYER = "Pablo"
 
-# Colour palette
+# Paleta de cores
 BLACK  = (0,   0,   0)
 WHITE  = (255, 255, 255)
 GRAY   = (80,  80,  80)
@@ -46,7 +46,7 @@ class Game:
         self.completed = False
         self._load_save()
 
-        # Lazy import to avoid circular deps – states imported here
+        # Importacao tardia para evitar dependencias circulares - estados importados aqui
         from states.title_state import TitleState
         self.state_manager.change(TitleState(self))
 
@@ -117,7 +117,7 @@ class Game:
             normalized = [name for name in normalized if name != DEFAULT_STARTER_PLAYER]
         normalized.insert(0, DEFAULT_STARTER_PLAYER)
 
-        # Keep order while removing duplicates.
+        # Mantem a ordem ao remover duplicatas.
         seen = set()
         unique = []
         for name in normalized:
@@ -193,7 +193,7 @@ class Game:
     # ------------------------------------------------------------------
     def run(self):
         while self.running:
-            dt = self.clock.tick(FPS) / 1000.0  # seconds
+            dt = self.clock.tick(FPS) / 1000.0  # segundos
 
             events = pygame.event.get()
             for event in events:

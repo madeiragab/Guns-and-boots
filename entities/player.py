@@ -10,10 +10,10 @@ from core.sprite_animator import (
 )
 
 
-# Base directory containing player character sub-folders.
+# Diretorio base contendo subpastas dos personagens jogaveis.
 PLAYERS_BASE = os.path.join("assets", "sprites", "Players")
 BOSSES_BASE = os.path.join("assets", "sprites", "Bosses")
-# Make player sprites smaller for in-game rendering (appears behind UI on left)
+# Deixa os sprites do jogador menores para renderizacao no jogo (aparece atras da UI, a esquerda)
 TARGET_FRAME_SIZE = (160, 160)
 
 
@@ -23,7 +23,7 @@ class Player(Character):
     def __init__(self, name="PLAYER", folder=None):
         super().__init__(name=name, hp=30, atk=7, defense=2)
         self.level = 1
-        self.folder = folder  # subfolder name inside Players/
+        self.folder = folder  # nome da subpasta dentro de Players/
         self._in_boss_form = False
         self._base_form_stats = None
         self._load_animations_from_folders()
@@ -36,7 +36,7 @@ class Player(Character):
         self.hp = self.max_hp
 
     def _load_animations_from_folders(self):
-        # Determine which folder to load from
+        # Define de qual pasta carregar
         if self.folder:
             anim_base = os.path.join(PLAYERS_BASE, self.folder)
         else:
@@ -52,22 +52,22 @@ class Player(Character):
             s.fill((150, 0, 0, 255))
             animations = {"idle": [s]}
 
-        # Load special/anim as the "special" animation if it exists
+        # Carrega special/anim como animacao "special" se existir
         if self.folder:
             special_anim_path = os.path.join(PLAYERS_BASE, self.folder, "special", "anim")
             special_frames = _load_frames_from_folder(special_anim_path, target_size=TARGET_FRAME_SIZE)
             if special_frames:
                 animations["special"] = special_frames
 
-        # Use 12 FPS as requested
+        # Usa 12 FPS conforme solicitado
         self.animator = SpriteAnimator(animations, default="idle", fps=12, return_to_idle=True)
 
     def _load_bullet_and_special(self):
         """Load normal bullet and special bullet frames."""
-        # Normal bullet: shared default
+        # Tiro normal: padrao compartilhado
         self.bullet_frames = load_bullet_frames()
 
-        # Special bullet: from Players/<folder>/special/bullet/ (natural image size)
+        # Tiro especial: de Players/<folder>/special/bullet/ (tamanho natural da imagem)
         self.special_bullet_frames = None
         if self.folder:
             special_bullet_path = os.path.join(PLAYERS_BASE, self.folder, "special", "bullet")
@@ -121,7 +121,7 @@ class Player(Character):
             "medkits": self.medkits,
         }
 
-        # Aggressive buffs so the comeback feels meaningful.
+        # Buffs agressivos para que a virada pareca significativa.
         self.max_hp = max(int(self.max_hp * 1.6) + 20, self.max_hp + 35)
         self.hp = self.max_hp
         self.atk = max(self.atk + 5, int(self.atk * 1.5))

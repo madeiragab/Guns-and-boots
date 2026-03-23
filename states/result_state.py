@@ -22,7 +22,7 @@ class ResultState(BaseState):
 
     def __init__(self, game, outcome, enemy_profile=None, is_boss=False, is_final_boss=False):
         super().__init__(game)
-        self.outcome = outcome          # "win" | "lose"
+        self.outcome = outcome          # "vitoria" | "derrota"
         self.enemy_profile = enemy_profile
         self.is_boss = is_boss
         self.is_final_boss = is_final_boss
@@ -36,10 +36,10 @@ class ResultState(BaseState):
         self._blink_timer   = 0.0
         self._blink_visible = True
         self._fade_in_timer = 0.0
-        self._fade_in_duration = 1.0  # seconds to fade in
+        self._fade_in_duration = 1.0  # segundos para aparecer gradualmente
         self._accept_input = False
 
-        # Final-stand transformation is temporary and must not leak to other battles.
+        # A transformacao de ultima resistencia e temporaria e nao deve vazar para outras batalhas.
         try:
             if getattr(self.game.player, "_in_boss_form", False):
                 self.game.player.revert_from_boss_form()
@@ -54,7 +54,7 @@ class ResultState(BaseState):
                 self.game.save_game()
                 self._final_boss_victory = True
             elif self.is_boss:
-                # Unlock the corresponding player character
+                # Desbloqueia o personagem jogavel correspondente
                 if self.enemy_profile and self.enemy_profile not in self.game.unlocked_players:
                     self.game.unlocked_players.append(self.enemy_profile)
                 if self.enemy_profile and self.enemy_profile not in self.game.defeated_bosses:
@@ -63,7 +63,7 @@ class ResultState(BaseState):
                 self.game.save_game()
                 self._boss_victory = True
             else:
-                # Regular enemy defeated
+                # Inimigo comum derrotado
                 if self.enemy_profile and self.enemy_profile not in self.game.defeated_enemies:
                     self.game.defeated_enemies.append(self.enemy_profile)
                 self._all_cleared = not self._get_available_enemies()
@@ -137,11 +137,11 @@ class ResultState(BaseState):
         if retry_boss is not None:
             self.game.defeated_bosses = [name for name in defeated_now if name != retry_boss]
 
-        # Restart enemy progression so the player must clear enemies before boss again.
+        # Reinicia a progressao dos inimigos para o jogador limpar os inimigos antes do chefe novamente.
         self.game.defeated_enemies = []
         self.game.enemy_round = 0
 
-        # Keep campaign mode active and remember which final boss should be retried.
+        # Mantem o modo campanha ativo e lembra qual chefe final deve ser tentado de novo.
         self.game.completed = False
         self.game.final_boss_retry_target = self.enemy_profile
         self.game.save_game()
@@ -187,7 +187,7 @@ class ResultState(BaseState):
                         from states.hub_state import HubState
                         self.game.state_manager.change(HubState(self.game))
                 elif event.key == pygame.K_SPACE:
-                    # "Prepare more" — replay all enemies to level up
+                    # "Preparar mais" - repetir todos os inimigos para subir de nivel
                     if self.outcome == "win" and self._all_cleared and self._get_undefeated_bosses():
                         self._restart_enemy_gauntlet()
                 elif event.key == pygame.K_ESCAPE:

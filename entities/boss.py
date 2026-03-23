@@ -18,11 +18,11 @@ class Boss(Character):
         self._is_boss = True
         folder_path = os.path.join(BOSSES_BASE, folder_name)
 
-        # Default boss stats (tougher than regular enemies)
+        # Atributos padrao de chefe (mais forte que inimigos comuns)
         display_name = folder_name
         hp, atk, defense = 50, 10, 4
 
-        # Read meta.json if present
+        # Le meta.json se existir
         meta_path = os.path.join(folder_path, "meta.json")
         try:
             if os.path.isfile(meta_path):
@@ -39,7 +39,7 @@ class Boss(Character):
         super().__init__(name=display_name, hp=hp, atk=atk, defense=defense)
         self.profile = self.folder_name
 
-        # Load animations (flipped — boss appears on right side)
+        # Carrega animacoes (invertidas - chefe aparece no lado direito)
         try:
             animations = {}
             if os.path.isdir(folder_path):
@@ -61,7 +61,7 @@ class Boss(Character):
             s.fill((120, 20, 20, 255))
             animations = {"idle": [s]}
 
-        # Load special/anim as "special" animation
+        # Carrega special/anim como animacao "special"
         special_anim_path = os.path.join(folder_path, "special", "anim")
         special_frames = _load_frames_from_folder(special_anim_path, target_size=TARGET_FRAME_SIZE)
         if special_frames:
@@ -70,10 +70,10 @@ class Boss(Character):
 
         self.animator = SpriteAnimator(animations, default="idle", fps=12, return_to_idle=True)
 
-        # Normal bullet (shared default, flipped)
+        # Tiro normal (padrao compartilhado, invertido)
         self.bullet_frames = load_bullet_frames(flip=True)
 
-        # Special bullet at natural image size (no scaling)
+        # Tiro especial no tamanho natural da imagem (sem escala)
         special_bullet_path = os.path.join(folder_path, "special", "bullet")
         sp_frames = _load_frames_from_folder(special_bullet_path, target_size=None)
         if sp_frames:

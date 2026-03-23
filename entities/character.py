@@ -21,15 +21,15 @@ class Character:
 
     def take_damage(self, amount):
         if self.cover:
-            amount = max(0, amount - 2)   # cover absorbs 2 extra
+            amount = max(0, amount - 2)   # cobertura absorve mais 2
         self.hp = max(0, self.hp - amount)
-        self.cover = False                # cover consumed after hit
+        self.cover = False                # cobertura consumida apos o acerto
 
     def heal(self, amount):
         self.hp = min(self.max_hp, self.hp + amount)
 
     # ------------------------------------------------------------------
-    # Heat helpers
+    # Auxiliares de calor
     def add_heat(self, amount):
         self.heat = min(10, self.heat + amount)
 
@@ -39,7 +39,7 @@ class Character:
     def check_jam(self):
         """Returns True if the weapon jams this action."""
         if self.heat >= 8:
-            jam_chance = 0.10 + (self.heat - 8) * 0.15   # 10% at 8, 25% at 9, 40% at 10
+            jam_chance = 0.10 + (self.heat - 8) * 0.15   # 10% em 8, 25% em 9, 40% em 10
             return random.random() < jam_chance
         return False
 

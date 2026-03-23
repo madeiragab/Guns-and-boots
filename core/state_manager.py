@@ -5,13 +5,13 @@ class StateManager:
         self._stack = []
 
     # ------------------------------------------------------------------
-    # Internal helpers
+    # Auxiliares internos
     # ------------------------------------------------------------------
     def _current(self):
         return self._stack[-1] if self._stack else None
 
     # ------------------------------------------------------------------
-    # Public API
+    # API publica
     # ------------------------------------------------------------------
     def change(self, new_state):
         """Replace the current state with a new one."""
@@ -47,7 +47,7 @@ class StateManager:
                 game.on_state_changed(resumed)
 
     # ------------------------------------------------------------------
-    # Forwarded calls
+    # Chamadas encaminhadas
     # ------------------------------------------------------------------
     def handle_events(self, events):
         state = self._current()

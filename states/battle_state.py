@@ -17,22 +17,22 @@ ORANGE = (210, 130, 0)
 
 ACTIONS = ["ATIRAR", "COBERTURA", "ESPECIAL", "MEDKIT"]
 
-# ── Layout constants ──────────────────────────────────────────────────
+# ── Constantes de layout ──────────────────────────────────────────────
 W, H = 640, 360
 
-# Panels
+# Paineis
 PANEL_W       = W // 2 - 10
 ENEMY_PANEL_H = 68
 PLAYER_PANEL_H = 90
 
-# Enemy panel  (top-left)
+# Painel do inimigo (superior esquerdo)
 ENEMY_PANEL_Y = 0
 ENEMY_BAR_X   = 12
-ENEMY_BAR_Y   = ENEMY_PANEL_Y + 34    # below name label
+ENEMY_BAR_Y   = ENEMY_PANEL_Y + 34    # abaixo do rotulo de nome
 ENEMY_BAR_W   = 260
 ENEMY_BAR_H   = 16
 
-# Player panel (bottom-left)
+# Painel do jogador (inferior esquerdo)
 PLAYER_PANEL_Y = H - PLAYER_PANEL_H
 PLAYER_BAR_X   = 12
 PLAYER_BAR_Y   = PLAYER_PANEL_Y + 30
@@ -42,13 +42,13 @@ HEAT_BAR_Y     = PLAYER_PANEL_Y + 64
 HEAT_BAR_W     = 180
 HEAT_BAR_H     = 10
 
-# Action menu  (bottom-right) -- kept for input layout though not drawn
+# Menu de acoes (inferior direito) -- mantido para o layout de entrada, embora nao seja desenhado
 MENU_X     = W // 2 + 20
 MENU_Y     = H - 130
 BTN_W, BTN_H = 170, 22
 BTN_GAP    = 4
 
-# Log box (not drawn currently)
+# Caixa de log (nao desenhada atualmente)
 LOG_X, LOG_Y = 10, H - 130
 LOG_W, LOG_H = W // 2 - 20, 90
 
@@ -74,13 +74,13 @@ class BattleState(BaseState):
         self._transform_anim_active = False
         self._transform_anim_timer = 0.0
         self._transform_anim_duration = 1.25
-        self._projectiles = []  # active projectiles on screen
+        self._projectiles = []  # projetis ativos na tela
 
-        # Sprite positions (used for projectile start/end)
+        # Posicoes dos sprites (usadas para inicio/fim dos projetis)
         self._player_pos = (80, H - 10)
         self._enemy_pos = (W - 80, H - 10)
 
-        # Buttons (kept for input handling but not drawn)
+        # Botoes (mantidos para tratar entrada, mas nao desenhados)
         self._buttons = [
             Button(MENU_X, MENU_Y + i * (BTN_H + BTN_GAP), BTN_W, BTN_H, label)
             for i, label in enumerate(ACTIONS)
@@ -88,12 +88,12 @@ class BattleState(BaseState):
         self._update_disabled_buttons()
         self._update_selection()
 
-        # Health bars for each combatant; will be positioned above sprites
+        # Barras de vida de cada combatente; ficam posicionadas acima dos sprites
         bar_w, bar_h = 120, 12
         self._enemy_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.enemy.max_hp, label="HP INIMIGO", dynamic_color=True)
         self._player_hp_bar = HealthBar(0, 0, bar_w, bar_h, self.player.max_hp, label="HP JOGADOR", dynamic_color=True)
 
-        # Log kept but not drawn
+        # Log mantido, mas nao desenhado
         self._log = LogBox(LOG_X, LOG_Y, LOG_W, LOG_H, max_lines=5)
         self._log.add("Batalha iniciada!")
 
@@ -102,7 +102,7 @@ class BattleState(BaseState):
         except Exception:
             pass
 
-        # Pick a random field background from assets/sprites/field (walk recursively)
+        # Escolhe um fundo de campo aleatorio em assets/sprites/field (busca recursiva)
         try:
             base_field = os.path.join("assets", "sprites", "field")
             choices = []
@@ -113,15 +113,15 @@ class BattleState(BaseState):
 
             if choices:
                 pick = random.choice(choices)
-                # Avoid convert_alpha/convert here in case display isn't fully initialized;
-                # pygame.image.load alone returns a usable Surface.
+                # Evita convert_alpha/convert aqui caso o display ainda nao esteja totalmente inicializado;
+                # pygame.image.load sozinho retorna uma Surface utilizavel.
                 surf = pygame.image.load(pick)
-                # scale to fill screen while preserving aspect ratio
+                # escala para preencher a tela preservando a proporcao
                 sw, sh = surf.get_size()
                 scale = max(W / sw, H / sh)
                 nw, nh = int(sw * scale), int(sh * scale)
                 surf = pygame.transform.smoothscale(surf, (nw, nh))
-                # center crop to window
+                # recorte central para a janela
                 x = (nw - W) // 2
                 y = (nh - H) // 2
                 self._field_surf = surf.subsurface((x, y, W, H)).copy()
@@ -153,7 +153,7 @@ class BattleState(BaseState):
             self._selected = (self._selected + direction) % len(ACTIONS)
             if not self._buttons[self._selected].disabled:
                 return
-        # All disabled fallback (shouldn't happen)
+        # Reserva com tudo desabilitado (nao deveria acontecer)
         self._selected = 0
 
     # ------------------------------------------------------------------
@@ -175,7 +175,7 @@ class BattleState(BaseState):
     # ------------------------------------------------------------------
     def _player_act(self, action):
         action = action.replace("atirar", "shoot").replace("cobertura", "cover").replace("especial", "special")
-        # play matching animation
+        # toca a animacao correspondente
         anim_map = {
             "shoot": "shoot",
             "cover": "cover",
@@ -187,7 +187,7 @@ class BattleState(BaseState):
         except Exception:
             pass
 
-        # For shoot/special, spawn a projectile first, then resolve on hit
+        # Para tiro/especial, cria um projetil primeiro e resolve no acerto
         if action in ("shoot", "special"):
             if action == "special":
                 self.game.play_special_sfx()
@@ -196,7 +196,7 @@ class BattleState(BaseState):
             bullet_frames = (self.player.special_bullet_frames
                              if action == "special"
                              else self.player.bullet_frames)
-            # Projectile flies from player to enemy
+            # O projetil voa do jogador para o inimigo
             start = (self._player_pos[0] + 40, self._player_pos[1] - 80)
             end = (self._enemy_pos[0] - 40, self._enemy_pos[1] - 80)
 
@@ -207,7 +207,7 @@ class BattleState(BaseState):
             self._projectiles.append(proj)
             self._turn = "projectile"
         else:
-            # Non-projectile actions resolve immediately
+            # Acoes sem projetil resolvem imediatamente
             logs = resolve_action(self.player, self.enemy, action)
             for line in logs:
                 self._log.add(line)
@@ -220,7 +220,7 @@ class BattleState(BaseState):
         for line in logs:
             self._log.add(line)
 
-        # play enemy damage animation if HP decreased
+        # toca animacao de dano do inimigo se o HP diminuir
         if self.enemy.hp < enemy_before_hp:
             try:
                 self.enemy.play("damage")
@@ -235,18 +235,18 @@ class BattleState(BaseState):
             self._end_battle("win")
             return
 
-        # Enemy turn after a short delay
+        # Turno do inimigo apos um pequeno atraso
         self._turn       = "enemy"
         self._waiting    = True
         self._wait_timer = 0.0
 
     # ------------------------------------------------------------------
     def _enemy_act(self):
-        # Tick down enemy cooldowns
+        # Reduz os cooldowns do inimigo
         if self.enemy.special_cooldown > 0:
             self.enemy.special_cooldown -= 1
         action = choose_action(self.enemy, self.player)
-        # play enemy animation for this action
+        # toca a animacao do inimigo para esta acao
         if action == "special" and "special" in self.enemy.animator.animations:
             anim_name = "special"
         else:
@@ -264,7 +264,7 @@ class BattleState(BaseState):
             bullet_frames = (self.enemy.special_bullet_frames
                              if action == "special"
                              else self.enemy.bullet_frames)
-            # Projectile flies from enemy to player
+            # O projetil voa do inimigo para o jogador
             start = (self._enemy_pos[0] - 40, self._enemy_pos[1] - 80)
             end = (self._player_pos[0] + 40, self._player_pos[1] - 80)
 
@@ -305,11 +305,11 @@ class BattleState(BaseState):
             return
 
         self._turn = "player"
-        # Tick down cooldowns at start of player turn
+        # Reduz cooldowns no inicio do turno do jogador
         if self.player.special_cooldown > 0:
             self.player.special_cooldown -= 1
         self._update_disabled_buttons()
-        # If current selection is now disabled, move to a valid one
+        # Se a selecao atual estiver desabilitada, move para uma opcao valida
         if self._buttons[self._selected].disabled:
             self._skip_to_valid(1)
         self._update_selection()
@@ -323,7 +323,7 @@ class BattleState(BaseState):
         if not hasattr(self.player, "activate_final_boss_form"):
             return False
 
-        # Don't transform immediately; start the warning phase
+        # Nao transforma imediatamente; inicia a fase de aviso
         self._final_stand_used = True
         self._final_stand_warning_active = True
         self._final_stand_warning_timer = 0.0
@@ -334,8 +334,8 @@ class BattleState(BaseState):
         self._turn = "dying"
         self._death_outcome = outcome
         self._death_timer = 0.0
-        self._death_duration = 1.5  # seconds for red tint + fade out
-        # Switch the dead character to idle
+        self._death_duration = 1.5  # segundos para tonalidade vermelha + fade out
+        # Muda o personagem morto para estado ocioso (idle)
         dead = self.enemy if outcome == "win" else self.player
         try:
             dead.play("idle")
@@ -344,18 +344,18 @@ class BattleState(BaseState):
 
     # ------------------------------------------------------------------
     def update(self, dt):
-        # update player animation
+        # atualiza a animacao do jogador
         try:
             self.player.update(dt)
         except Exception:
             pass
-        # update enemy animation
+        # atualiza a animacao do inimigo
         try:
             self.enemy.update(dt)
         except Exception:
             pass
 
-        # Update active projectiles
+        # Atualiza os projetis ativos
         for proj in self._projectiles:
             proj.update(dt)
         self._projectiles = [p for p in self._projectiles if not p.finished]
@@ -395,8 +395,8 @@ class BattleState(BaseState):
                 )
             return
 
-        # When projectile phase is done (all projectiles finished), the on_hit
-        # callback already moved the turn forward, so nothing extra needed here.
+        # Quando a fase de projetis termina (todos concluidos), o on_hit
+        # o retorno ja avancou o turno, entao nada extra e necessario aqui.
 
         if self._waiting:
             self._wait_timer += dt
@@ -477,7 +477,7 @@ class BattleState(BaseState):
 
         progress = min(1.0, self._final_stand_warning_timer / self._final_stand_warning_duration)
         
-        # Intense blinking effect (faster pulses)
+        # Efeito de piscada intensa (pulsos mais rapidos)
         blink_cycle = (self._final_stand_warning_timer * 8) % 1.0
         flash_visible = blink_cycle < 0.5
         
@@ -487,7 +487,7 @@ class BattleState(BaseState):
             flash.fill((255, 50, 50, flash_alpha))
             screen.blit(flash, (0, 0))
         
-        # Message appears mid-way through the warning phase
+        # A mensagem aparece na metade da fase de aviso
         if progress > 0.25:
             msg_alpha = int(255 * min(1.0, (progress - 0.25) / 0.25))
             font = pygame.font.SysFont("Courier New", 36, bold=True)
@@ -531,7 +531,7 @@ class BattleState(BaseState):
 
     # ------------------------------------------------------------------
     def draw(self, screen):
-        # Draw field background if available, otherwise full black background.
+        # Desenha o fundo de campo se disponivel; caso contrario, fundo preto total.
         if getattr(self, "_field_surf", None) is not None:
             try:
                 screen.blit(self._field_surf, (0, 0))
@@ -542,26 +542,26 @@ class BattleState(BaseState):
 
         font_small = pygame.font.SysFont("Courier New", 12)
 
-        # Death effect state
+        # Estado do efeito de morte
         is_dying, death_alpha = self._get_death_alpha()
         player_dying = is_dying and getattr(self, '_death_outcome', '') == "lose"
         enemy_dying  = is_dying and getattr(self, '_death_outcome', '') == "win"
 
-        # Optional: draw player sprite in the left area (behind where UI used to be)
+        # Opcional: desenha o sprite do jogador na area esquerda (atras de onde a UI ficava)
         try:
-            # player at bottom-left corner (feet anchored) moved slightly right
+            # jogador no canto inferior esquerdo (pes ancorados), movido levemente para a direita
             px = 80
             py = H - 10
-            # draw sprite and also render player name above the sprite
+            # desenha o sprite e tambem renderiza o nome do jogador acima dele
             img = None
             try:
                 img = self.player.animator.get_image()
             except Exception:
                 img = None
 
-            # Skip normal draw if transformation animation is active (will draw transformed version)
+            # Pula o desenho normal se a animacao de transformacao estiver ativa (desenha a versao transformada)
             if not self._transform_anim_active:
-                # draw sprite (uses midbottom anchoring)
+                # desenha o sprite (usa ancoragem midbottom)
                 if img is not None and player_dying:
                     tinted = self._tint_red_and_fade(img, death_alpha)
                     rect = tinted.get_rect(midbottom=(px, py))
@@ -569,7 +569,7 @@ class BattleState(BaseState):
                 else:
                     self.player.draw(screen, (px, py))
 
-            # draw name + level above sprite
+            # desenha nome + nivel acima do sprite
             if img is not None:
                 rect = img.get_rect(midbottom=(px, py))
                 name_font = pygame.font.SysFont("Courier New", 14, bold=True)
@@ -581,7 +581,7 @@ class BattleState(BaseState):
         except Exception:
             pass
 
-        # Place HP bars: PLAYER on the left, ENEMY on the right
+        # Posiciona barras de HP: JOGADOR a esquerda, INIMIGO a direita
         try:
             self._player_hp_bar.max_value = max(1, self.player.max_hp)
             self._player_hp_bar.rect.topleft = (ENEMY_BAR_X, ENEMY_BAR_Y)
@@ -596,11 +596,11 @@ class BattleState(BaseState):
         except Exception:
             pass
 
-        # Draw enemy sprite at bottom-right (feet anchored)
+        # Desenha o sprite do inimigo no canto inferior direito (pes ancorados)
         try:
             ex = W - 80
             ey = H - 10
-            # enemy animator is updated in update(dt)
+            # o animador do inimigo e atualizado em update(dt)
 
             try:
                 img = None
@@ -616,7 +616,7 @@ class BattleState(BaseState):
                 else:
                     self.enemy.draw(screen, (ex, ey))
 
-                # draw enemy name above sprite
+                # desenha o nome do inimigo acima do sprite
                 if img is not None:
                     rect = img.get_rect(midbottom=(ex, ey))
                     name_font = pygame.font.SysFont("Courier New", 14, bold=True)
@@ -624,7 +624,7 @@ class BattleState(BaseState):
                     lbl_r = lbl.get_rect(midbottom=(rect.centerx, rect.top - 6))
                     screen.blit(lbl, lbl_r)
             except Exception:
-                # fallback placeholder box
+                # caixa placeholder de reserva
                 box_w, box_h = 80, 120
                 surf = pygame.Surface((box_w, box_h))
                 surf.fill((40, 40, 40))
@@ -638,11 +638,11 @@ class BattleState(BaseState):
         except Exception:
             pass
 
-        # Draw projectiles
+        # Desenha projetis
         for proj in self._projectiles:
             proj.draw(screen)
 
-        # Draw buttons centered at bottom (compact row)
+        # Desenha botoes centralizados embaixo (linha compacta)
         try:
             btn_count = len(self._buttons)
             total_w = BTN_W * btn_count + BTN_GAP * (btn_count - 1)

@@ -43,7 +43,7 @@ def load_animations_from_folders(base_path, scale=1, colorkey=(0, 0, 0), target_
             except Exception:
                 continue
 
-            # prefer real alpha
+            # preferir alfa real
             try:
                 img = img.convert_alpha()
             except Exception:
@@ -52,13 +52,13 @@ def load_animations_from_folders(base_path, scale=1, colorkey=(0, 0, 0), target_
             if img.get_alpha() is None and colorkey is not None:
                 img.set_colorkey(colorkey)
 
-            # If a target_size is provided, scale the frame to fit while
-            # preserving aspect ratio and place it on a transparent surface
-            # of the target size anchored to the bottom (so feet align).
+            # Se target_size for fornecido, redimensiona o quadro para caber enquanto
+            # preserva a proporcao e posiciona em uma superficie transparente
+            # do tamanho alvo ancorada na base (para alinhar os pes).
             if target_size is not None:
                 tw, th = target_size
                 w, h = img.get_size()
-                # compute scale preserving aspect
+                # calcula a escala preservando a proporcao
                 sx = tw / w
                 sy = th / h
                 s = min(sx, sy)
@@ -70,7 +70,7 @@ def load_animations_from_folders(base_path, scale=1, colorkey=(0, 0, 0), target_
                     scaled = pygame.transform.scale(img, (new_w, new_h))
 
                 surface = pygame.Surface((tw, th), pygame.SRCALPHA)
-                # place scaled image so its bottom aligns with surface bottom
+                # posiciona a imagem escalada para alinhar a base com a base da superficie
                 dst_x = (tw - new_w) // 2
                 dst_y = th - new_h
                 surface.blit(scaled, (dst_x, dst_y))
@@ -140,7 +140,7 @@ class SpriteAnimator:
                 if self.loop or self.current == self.default:
                     self.index = 0
                 else:
-                    # animation finished
+                    # animacao finalizada
                     self.index = len(frames) - 1
                     self.finished = True
                     if self.return_to_idle and self.default in self.animations:

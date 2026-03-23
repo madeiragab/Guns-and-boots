@@ -8,7 +8,7 @@ Keys 1-9 trigger different animations. ESC quits.
 import sys
 import os
 
-# Ensure project root is on sys.path and CWD is root
+# Garante que a raiz do projeto esteja no sys.path e o CWD seja a raiz
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 os.chdir(ROOT)

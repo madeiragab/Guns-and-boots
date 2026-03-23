@@ -23,7 +23,7 @@ class TitleState(BaseState):
         self._has_save = self.game.has_save()
         self._selected = 0  # 0=CONTINUAR, 1=NOVO JOGO
 
-        # Load background image
+        # Carrega imagem de fundo
         self._bg = None
         try:
             if os.path.isfile(BG_PATH):

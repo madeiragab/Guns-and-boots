@@ -31,7 +31,7 @@ def _choose_final_boss_action(enemy, player):
     player_ratio = player.hp / max(1, player.max_hp)
     can_special = getattr(enemy, "special_cooldown", 0) <= 0
 
-    # Guaranteed kill windows: always take them.
+    # Janelas de abate garantido: sempre aproveite.
     shoot_kill = player.hp <= max(1, enemy.atk - player.defense)
     special_kill = can_special and player.hp <= max(2, (enemy.atk + 2 - player.defense) * 2)
     if special_kill:
@@ -39,14 +39,14 @@ def _choose_final_boss_action(enemy, player):
     if shoot_kill:
         return "shoot"
 
-    # Critical survival logic.
+    # Logica critica de sobrevivencia.
     if hp_ratio < 0.25 and enemy.medkits > 0:
         if enemy.heat >= 8:
             return "cover"
         return "medkit"
 
     if enemy.heat >= 9:
-        # Alternate between cooling and pressure to avoid free turns.
+        # Alterna entre resfriar e pressionar para evitar turnos gratis.
         if can_special and player_ratio < 0.45 and random.random() < 0.35:
             return "special"
         return "cover"
@@ -57,7 +57,7 @@ def _choose_final_boss_action(enemy, player):
     if enemy.medkits > 0:
         candidates.append("medkit")
 
-    # Context-sensitive utility bonuses.
+    # Bonus de utilidade sensiveis ao contexto.
     scored = []
     for action in candidates:
         score = _expected_damage(enemy, player, action)
@@ -86,7 +86,7 @@ def _choose_final_boss_action(enemy, player):
 
     scored.sort(reverse=True)
 
-    # Keep strong decisions while staying slightly unpredictable.
+    # Mantem decisoes fortes, permanecendo levemente imprevisivel.
     top_score = scored[0][0]
     top_actions = [action for score, action in scored if score >= top_score - 1.0]
     return random.choice(top_actions)
@@ -103,20 +103,20 @@ def choose_action(enemy, player):
     if is_final_boss:
         return _choose_final_boss_action(enemy, player)
 
-    # Prioritise healing if badly wounded and medkits available
+    # Prioriza cura se estiver muito ferido e houver kits medicos
     if hp_ratio < 0.30 and enemy.medkits > 0:
         if random.random() < 0.65:
             return "medkit"
 
-    # Cool down if overheated
+    # Resfria se estiver superaquecido
     if enemy.heat >= 8:
         if random.random() < 0.55:
             return "cover"
 
-    # Check which actions are available
+    # Verifica quais acoes estao disponiveis
     can_special = getattr(enemy, 'special_cooldown', 0) <= 0
 
-    # Bosses use specials more aggressively
+    # Chefes usam especiais de forma mais agressiva
     if is_boss and can_special:
         roll = random.random()
         if roll < 0.45:

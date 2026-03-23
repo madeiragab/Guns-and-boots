@@ -21,7 +21,7 @@ class DangerState(BaseState):
         self._flash_speed = 0.3
 
     def handle_events(self, events):
-        pass  # no input during danger screen
+        pass  # sem entrada durante a tela de perigo
 
     def update(self, dt):
         self._timer += dt
@@ -43,7 +43,7 @@ class DangerState(BaseState):
         except Exception:
             pass
 
-        # Keep Pablo available in the boss pool even as the starter character.
+        # Mantem Pablo disponivel no grupo de chefes mesmo como personagem inicial.
         for name in MANDATORY_BOSSES:
             if name not in boss_folders:
                 boss_folders.append(name)

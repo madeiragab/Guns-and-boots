@@ -24,7 +24,7 @@ class FinalDangerState(BaseState):
         self._blink_visible = True
         self._flash_speed = 0.25
 
-        # Pre-build crack geometry so the animation feels stable and intentional.
+        # Preconstroi a geometria das rachaduras para a animacao parecer estavel e intencional.
         self._crack_origin = (W // 2, H // 2)
         self._main_cracks = []
         self._branch_cracks = []
@@ -102,7 +102,7 @@ class FinalDangerState(BaseState):
         from states.credits_state import CreditsState
         from states.hub_state import HubState
 
-        # Hard gate: final boss only unlocks after all regular bosses are beaten.
+        # Regra rigida: o chefe final so libera apos derrotar todos os chefes regulares.
         if not self._all_regular_bosses_defeated():
             self.game.state_manager.change(HubState(self.game))
             return
@@ -133,7 +133,7 @@ class FinalDangerState(BaseState):
         reveal_count = int(len(self._main_cracks) * progress)
         reveal_branches = int(len(self._branch_cracks) * progress)
 
-        # Subtle flash pulses to mimic impact waves.
+        # Pulsos de flash sutis para imitar ondas de impacto.
         pulse_alpha = int((0.35 + 0.65 * progress) * 80)
         pulse = pygame.Surface((W, H), pygame.SRCALPHA)
         pulse.fill((255, 255, 255, pulse_alpha if self._blink_visible else pulse_alpha // 2))
@@ -146,7 +146,7 @@ class FinalDangerState(BaseState):
         for start, end in self._branch_cracks[:reveal_branches]:
             pygame.draw.line(screen, branch_color, start, end, 1)
 
-        # Dark vignette blocks around corners to sell the broken-screen feeling.
+        # Blocos de vinheta escura nos cantos para reforcar a sensacao de tela quebrada.
         shard = pygame.Surface((W, H), pygame.SRCALPHA)
         corner_alpha = int(85 + progress * 90)
         pygame.draw.polygon(shard, (15, 0, 0, corner_alpha), [(0, 0), (180, 0), (0, 120)])

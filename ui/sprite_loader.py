@@ -19,13 +19,13 @@ def load_sprite_sheet(path, frame_width, frame_height, scale=1, colorkey=(0, 0, 
         raise FileNotFoundError(path)
 
     img = pygame.image.load(path)
-    # try to keep per-pixel alpha if present
+    # tenta manter alfa por pixel, se existir
     try:
         img = img.convert_alpha()
     except Exception:
         img = img.convert()
 
-    # If image has no alpha channel and a colorkey is provided, set it
+    # Se a imagem nao tiver canal alfa e houver colorkey, aplica
     if img.get_alpha() is None and colorkey is not None:
         img.set_colorkey(colorkey)
 
@@ -42,10 +42,10 @@ def load_sprite_sheet(path, frame_width, frame_height, scale=1, colorkey=(0, 0, 
             except Exception:
                 continue
 
-            # If no alpha, use mask to detect empty frames
+            # Se nao houver alfa, usa mascara para detectar quadros vazios
             mask = pygame.mask.from_surface(frame)
             if mask.count() == 0:
-                # skip fully empty frames
+                # ignora quadros totalmente vazios
                 continue
 
             if scale and scale != 1:
@@ -57,7 +57,7 @@ def load_sprite_sheet(path, frame_width, frame_height, scale=1, colorkey=(0, 0, 
 
             frames.append(frame)
 
-    # If no frames found, fall back to whole image as single frame
+    # Se nenhum quadro for encontrado, usa a imagem inteira como quadro unico
     if not frames:
         single = img
         if scale and scale != 1:
@@ -101,11 +101,11 @@ class SpriteAnimator:
             self.looping = loop
 
     def update(self, dt):
-        # dt provided in seconds -> convert to ms
+        # dt fornecido em segundos -> converte para ms
         ms = dt * 1000.0
         self.timer += ms
 
-        # resolve duration for this animation
+        # resolve a duracao para esta animacao
         dur = self.frame_duration
         if isinstance(self.frame_duration, dict):
             dur = self.frame_duration.get(self.current, 150)
@@ -126,7 +126,7 @@ class SpriteAnimator:
                 else:
                     self.index = len(frames) - 1
                     self.finished = True
-                    # optionally return to idle
+                    # opcionalmente retorna para estado idle
                     if self.return_to_idle:
                         self.play(self.default, loop=True, reset=True)
                     break

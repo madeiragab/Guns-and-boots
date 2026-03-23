@@ -97,7 +97,7 @@ class HubState(BaseState):
                 return
 
             from entities.enemy import Enemy
-            # Fresh run — reset enemy progression and player level
+            # Nova partida - reinicia a progressao dos inimigos e o nivel do jogador
             self.game.defeated_enemies = []
             self.game.enemy_round = 0
             self.game.player.level = 1
@@ -105,7 +105,7 @@ class HubState(BaseState):
             self.game.player.max_hp = 30
             self.game.player.hp = 30
 
-            # Look for available enemy folders under assets/sprites/Enemy
+            # Procura pastas de inimigos disponiveis em assets/sprites/Enemy
             base = os.path.join("assets", "sprites", "Enemy")
             enemy_folders = []
             try:
@@ -142,7 +142,7 @@ class HubState(BaseState):
         font_small = pygame.font.SysFont("Courier New", 13)
         font_btn   = pygame.font.SysFont("Courier New", 16)
 
-        # Heading
+        # Titulo
         welcome = font_title.render(
             f"BEM-VINDO, {self.game.player.name}", True, WHITE
         )
@@ -154,10 +154,10 @@ class HubState(BaseState):
         sub = font_small.render(sub_txt, True, GRAY)
         screen.blit(sub, (W // 2 - sub.get_width() // 2, 100))
 
-        # Buttons
+        # Botoes
         for btn in self._buttons:
             btn.draw(screen, font_btn)
 
-        # Hint
+        # Dica
         hint = font_small.render("↑↓ navigate    ENTER select    ESC title", True, GRAY)
         screen.blit(hint, (W // 2 - hint.get_width() // 2, H - 30))

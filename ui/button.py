@@ -14,8 +14,8 @@ class Button:
     def __init__(self, x, y, width, height, text):
         self.rect     = pygame.Rect(x, y, width, height)
         self.text     = text
-        self.active   = False     # highlighted / selected
-        self.disabled = False     # grayed out / unclickable
+        self.active   = False     # destacado / selecionado
+        self.disabled = False     # acinzentado / nao clicavel
 
     def draw(self, screen, font):
         if self.disabled:

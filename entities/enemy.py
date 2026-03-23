@@ -25,14 +25,14 @@ class Enemy(Character):
     }
 
     def __init__(self, profile="GRUNT", level=0):
-        # Save the original folder name for tracking (never overwritten by meta)
+        # Salva o nome original da pasta para rastreamento (nunca sobrescrito pelo meta)
         self.folder_name = profile
         self.level = level
-        # If profile matches a known profile, use those stats.
+        # Se o perfil corresponder a um perfil conhecido, usa esses atributos.
         data = self.PROFILES.get(profile)
         display_name = profile
-        # Also allow overriding stats from an optional meta.json inside the enemy folder
-        # Path: assets/sprites/Enemy/<profile>/meta.json
+        # Tambem permite sobrescrever atributos com um meta.json opcional dentro da pasta do inimigo
+        # Caminho: assets/sprites/Enemy/<profile>/meta.json
         meta_path = None
         try:
             base = os.path.join("assets", "sprites", "Enemy")
@@ -42,18 +42,18 @@ class Enemy(Character):
                 import json
                 with open(meta_path, "r", encoding="utf-8") as fh:
                     meta = json.load(fh)
-                # merge meta into data (meta values override)
+                # mescla meta em data (valores de meta sobrescrevem)
                 if data is None:
                     data = {}
                 data.update({k: meta[k] for k in ("hp", "atk", "defense") if k in meta})
-                # allow renaming (display only)
+                # permite renomear (apenas exibicao)
                 if "name" in meta:
                     display_name = meta["name"]
         except Exception:
             pass
 
         if data is None:
-            # Unknown profile (likely a folder name). Use sensible defaults.
+            # Perfil desconhecido (provavelmente nome de pasta). Usa padroes sensatos.
             data = {"hp": 22, "atk": 5, "defense": 1, "sprite": None}
 
         super().__init__(
@@ -64,7 +64,7 @@ class Enemy(Character):
         )
         self.profile = self.folder_name
 
-        # Try to load animations from assets/sprites/Enemy/<profile>/
+        # Tenta carregar animacoes de assets/sprites/Enemy/<profile>/
         try:
             base = os.path.join("assets", "sprites", "Enemy")
             path = os.path.join(base, self.folder_name)
@@ -72,7 +72,7 @@ class Enemy(Character):
             if os.path.isdir(path):
                 animations = load_animations_from_folders(path, scale=1, colorkey=(0, 0, 0), target_size=(160, 160))
 
-            # If found, flip frames horizontally (enemies face left)
+            # Se encontrar, inverte os quadros horizontalmente (inimigos olham para a esquerda)
             if animations:
                 for k, frames in animations.items():
                     for i, f in enumerate(frames):
@@ -85,14 +85,14 @@ class Enemy(Character):
             animations = {}
 
         if not animations:
-            # fallback placeholder
+            # marcador padrao de reserva
             s = pygame.Surface((160, 160), pygame.SRCALPHA)
             s.fill((80, 80, 80, 255))
             animations = {"idle": [s]}
 
         self.animator = SpriteAnimator(animations, default="idle", fps=12, return_to_idle=True)
 
-        # Load bullet frames (flipped for enemy direction)
+        # Carrega quadros do projetil (invertidos para a direcao do inimigo)
         self.bullet_frames = load_bullet_frames(flip=True)
         self.special_bullet_frames = self.bullet_frames
 

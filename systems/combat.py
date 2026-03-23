@@ -7,7 +7,7 @@ def _compute_hit_chance(attacker, defender):
     modifier = (attacker.atk - defender.defense) * 0.03
     chance = base + modifier
     chance = max(0.2, min(0.95, chance))
-    # If defender is in cover, reduce chance by 50%
+    # Se o defensor estiver em cobertura, reduz a chance em 50%
     if defender.cover:
         chance *= 0.5
     return chance
