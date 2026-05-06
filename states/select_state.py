@@ -2,6 +2,8 @@ import os
 import pygame
 from states.base_state import BaseState
 from core.sprite_animator import load_animations_from_folders, SpriteAnimator
+from ui.font_cache import get_font
+from core.paths import get_asset_path
 
 WHITE  = (255, 255, 255)
 GRAY   = (100, 100, 100)
@@ -11,7 +13,7 @@ YELLOW = (180, 180, 60)
 RED    = (200, 40,  40)
 GREEN  = (50,  200, 80)
 
-PLAYERS_BASE = os.path.join("assets", "sprites", "Players")
+PLAYERS_BASE = get_asset_path("sprites", "Players")
 PREVIEW_SIZE = (128, 128)
 
 W, H = 640, 360
@@ -30,6 +32,9 @@ class SelectState(BaseState):
     def on_enter(self):
         self._selected = 0
         self._characters = []
+        self._box_rect = None
+        self._left_arrow_rect = None
+        self._right_arrow_rect = None
 
         try:
             folders = sorted(
@@ -88,6 +93,21 @@ class SelectState(BaseState):
                 elif event.key == pygame.K_ESCAPE:
                     from states.name_state import NameInputState
                     self.game.state_manager.change(NameInputState(self.game))
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # allow tapping the box to confirm or arrows to change
+                mobile = getattr(self.game, 'mobile', False)
+                pt = event.pos
+                if self._box_rect and self._box_rect.collidepoint(pt):
+                    ch = self._characters[self._selected]
+                    if ch["unlocked"]:
+                        self._confirm()
+                        return
+                if self._left_arrow_rect and self._left_arrow_rect.collidepoint(pt):
+                    self._selected = (self._selected - 1) % len(self._characters)
+                    return
+                if self._right_arrow_rect and self._right_arrow_rect.collidepoint(pt):
+                    self._selected = (self._selected + 1) % len(self._characters)
+                    return
 
     # ------------------------------------------------------------------
     def _confirm(self):
@@ -108,12 +128,12 @@ class SelectState(BaseState):
     def draw(self, screen):
         screen.fill(BLACK)
 
-        font_title = pygame.font.SysFont("Courier New", 22, bold=True)
-        font_name  = pygame.font.SysFont("Courier New", 16, bold=True)
-        font_info  = pygame.font.SysFont("Courier New", 13)
-        font_hint  = pygame.font.SysFont("Courier New", 12)
-        font_lock  = pygame.font.SysFont("Courier New", 36, bold=True)
-        font_arrow = pygame.font.SysFont("Courier New", 36, bold=True)
+        font_title = get_font("Courier New", 22, bold=True)
+        font_name  = get_font("Courier New", 16, bold=True)
+        font_info  = get_font("Courier New", 13)
+        font_hint  = get_font("Courier New", 12)
+        font_lock  = get_font("Courier New", 36, bold=True)
+        font_arrow = get_font("Courier New", 36, bold=True)
 
         # Titulo
         title = font_title.render("ESCOLHA SEU PERSONAGEM", True, WHITE)
@@ -167,8 +187,15 @@ class SelectState(BaseState):
         if len(self._characters) > 1:
             arr_l = font_arrow.render("<", True, WHITE)
             arr_r = font_arrow.render(">", True, WHITE)
-            screen.blit(arr_l, (box_x - 50, box_y + box_h // 2 - arr_l.get_height() // 2))
-            screen.blit(arr_r, (box_x + box_w + 20, box_y + box_h // 2 - arr_r.get_height() // 2))
+            lx = box_x - 50
+            ly = box_y + box_h // 2 - arr_l.get_height() // 2
+            rx = box_x + box_w + 20
+            ry = box_y + box_h // 2 - arr_r.get_height() // 2
+            screen.blit(arr_l, (lx, ly))
+            screen.blit(arr_r, (rx, ry))
+            # store hit rects for touch handling
+            self._left_arrow_rect = pygame.Rect(lx, ly, arr_l.get_width(), arr_l.get_height())
+            self._right_arrow_rect = pygame.Rect(rx, ry, arr_r.get_width(), arr_r.get_height())
 
         # ── Nome do personagem ───────────────────────────────────────
         name_color = WHITE if ch["unlocked"] else GRAY
@@ -187,6 +214,9 @@ class SelectState(BaseState):
         else:
             status = font_info.render("BLOQUEADO", True, RED)
         screen.blit(status, (W // 2 - status.get_width() // 2, box_y + box_h + 48))
+
+        # store box rect for touch handling
+        self._box_rect = box_rect
 
         # ── Dicas ────────────────────────────────────────────────────
         hint = font_hint.render(

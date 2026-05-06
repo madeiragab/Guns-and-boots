@@ -2,6 +2,7 @@ import os
 import random
 import pygame
 from states.base_state import BaseState
+from ui.font_cache import get_font
 
 W, H = 640, 360
 MANDATORY_BOSSES = ["Pablo"]
@@ -70,6 +71,6 @@ class DangerState(BaseState):
         screen.fill((140, 0, 0))
 
         if self._blink_visible:
-            font = pygame.font.SysFont("Courier New", 64, bold=True)
+            font = get_font("Courier New", 64, bold=True)
             text = font.render("PERIGO", True, (255, 255, 255))
             screen.blit(text, (W // 2 - text.get_width() // 2, H // 2 - text.get_height() // 2))

@@ -2,6 +2,8 @@ import os
 import pygame
 
 from states.base_state import BaseState
+from ui.font_cache import get_font
+from core.paths import get_asset_path
 
 WHITE = (255, 255, 255)
 GRAY = (120, 120, 120)
@@ -9,7 +11,7 @@ GREEN = (50, 200, 80)
 BLACK = (0, 0, 0)
 
 W, H = 640, 360
-BOSSES_BASE = os.path.join("assets", "sprites", "Bosses")
+BOSSES_BASE = get_asset_path("sprites", "Bosses")
 
 
 class CreditsState(BaseState):
@@ -50,9 +52,9 @@ class CreditsState(BaseState):
     def draw(self, screen):
         screen.fill(BLACK)
 
-        title_font = pygame.font.SysFont("Courier New", 32, bold=True)
-        line_font = pygame.font.SysFont("Courier New", 18)
-        small_font = pygame.font.SysFont("Courier New", 13)
+        title_font = get_font("Courier New", 32, bold=True)
+        line_font = get_font("Courier New", 18)
+        small_font = get_font("Courier New", 13)
 
         y = 36
         title = title_font.render("CREDITOS", True, GREEN)

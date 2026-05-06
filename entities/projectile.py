@@ -1,9 +1,10 @@
 import os
 import pygame
 from core.sprite_animator import SpriteAnimator
+from core.paths import get_asset_path
 
 # Caminho padrao compartilhado do projetil
-DEFAULT_BULLET_PATH = os.path.join("assets", "sprites", "bullet")
+DEFAULT_BULLET_PATH = get_asset_path("sprites", "bullet")
 BULLET_SIZE = (32, 32)
 
 

@@ -3,10 +3,11 @@ import os
 import random
 import pygame
 from core.state_manager import StateManager
+from core.paths import get_asset_path, get_runtime_root
 
 WIDTH, HEIGHT = 640, 360
-SAVE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "save.json")
-ASSETS_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
+SAVE_PATH = os.path.join(get_runtime_root(), "save.json")
+ASSETS_PATH = get_asset_path()
 SFX_PATH = os.path.join(ASSETS_PATH, "sfx")
 FPS = 60
 TITLE = "Guns and Boots"
@@ -22,8 +23,18 @@ RED    = (200, 40,  40)
 class Game:
     """Main game object. Owns the window, clock and state manager."""
 
-    def __init__(self):
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    def __init__(self, mobile=False):
+        """If `mobile` is True, start with a mobile-friendly resolution and
+        map touch/mouse taps to keyboard navigation.
+        """
+        self.mobile = bool(mobile)
+        if self.mobile:
+            # portrait-ish default for mobile testing; on actual device fullscreen may be used
+            screen_size = (360, 640)
+        else:
+            screen_size = (WIDTH, HEIGHT)
+
+        self.screen = pygame.display.set_mode(screen_size)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         self.running = True
@@ -44,6 +55,7 @@ class Game:
         self.enemy_round = 0
         self.player_name = ""
         self.completed = False
+        self.final_boss_retry_target = None
         self._load_save()
 
         # Importacao tardia para evitar dependencias circulares - estados importados aqui
@@ -171,17 +183,27 @@ class Game:
         except Exception:
             pass
         self.unlocked_players = [DEFAULT_STARTER_PLAYER]
-        self.defeated_bosses = []
-        self.defeated_final_bosses = []
-        self.defeated_enemies = []
-        self.enemy_round = 0
+        self.reset_campaign_progress()
         self.player_name = ""
         self.completed = False
+
+    def reset_enemy_progress(self):
+        """Reset the current run back to the enemy gauntlet start."""
+        self.defeated_enemies = []
+        self.enemy_round = 0
+        self.completed = False
+        self.final_boss_retry_target = None
+
+    def reset_campaign_progress(self):
+        """Reset all campaign progress while keeping unlocked players intact."""
+        self.reset_enemy_progress()
+        self.defeated_bosses = []
+        self.defeated_final_bosses = []
 
     def complete_game(self):
         """Mark save as completed and unlock all characters."""
         self.completed = True
-        players_base = os.path.join(ASSETS_PATH, "sprites", "Players")
+        players_base = get_asset_path("sprites", "Players")
         try:
             for name in os.listdir(players_base):
                 if os.path.isdir(os.path.join(players_base, name)) and name not in self.unlocked_players:
@@ -195,10 +217,33 @@ class Game:
         while self.running:
             dt = self.clock.tick(FPS) / 1000.0  # segundos
 
-            events = pygame.event.get()
-            for event in events:
+            raw_events = pygame.event.get()
+            # Convert touch / mouse taps into keyboard events when running mobile mode
+            events = []
+            for event in raw_events:
                 if event.type == pygame.QUIT:
                     self.running = False
+                    events.append(event)
+                    continue
+
+                if self.mobile and event.type == pygame.MOUSEBUTTONDOWN:
+                    try:
+                        x, y = event.pos
+                        w, h = self.screen.get_size()
+                        # left third -> left, right third -> right, center -> confirm
+                        if x < w * 0.33:
+                            events.append(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_LEFT))
+                        elif x > w * 0.66:
+                            events.append(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RIGHT))
+                        else:
+                            events.append(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN))
+                    except Exception:
+                        # fallback: treat as ENTER
+                        events.append(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN))
+                    continue
+
+                # Pass through all other events unchanged
+                events.append(event)
 
             if self.state_manager.is_empty():
                 self.running = False

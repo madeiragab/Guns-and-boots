@@ -6,6 +6,8 @@ from ui.logbox    import LogBox
 from systems.combat import resolve_action
 from systems.ai     import choose_action
 from entities.projectile import Projectile
+from ui.font_cache import get_font
+from core.paths import get_asset_path
 import os
 import random
 
@@ -104,7 +106,7 @@ class BattleState(BaseState):
 
         # Escolhe um fundo de campo aleatorio em assets/sprites/field (busca recursiva)
         try:
-            base_field = os.path.join("assets", "sprites", "field")
+            base_field = get_asset_path("sprites", "field")
             choices = []
             for root, dirs, files in os.walk(base_field):
                 for fn in files:
@@ -171,6 +173,16 @@ class BattleState(BaseState):
                 elif event.key == pygame.K_RETURN:
                     if not self._buttons[self._selected].disabled:
                         self._player_act(ACTIONS[self._selected].lower().replace(" ", "_"))
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # allow tapping the on-screen action buttons
+                mobile = getattr(self.game, 'mobile', False)
+                for i, btn in enumerate(self._buttons):
+                    if btn.handle_event(event, mobile=mobile):
+                        if not btn.disabled:
+                            self._selected = i
+                            self._update_selection()
+                            self._player_act(ACTIONS[self._selected].lower().replace(" ", "_"))
+                        break
 
     # ------------------------------------------------------------------
     def _player_act(self, action):
@@ -490,7 +502,7 @@ class BattleState(BaseState):
         # A mensagem aparece na metade da fase de aviso
         if progress > 0.25:
             msg_alpha = int(255 * min(1.0, (progress - 0.25) / 0.25))
-            font = pygame.font.SysFont("Courier New", 36, bold=True)
+            font = get_font("Courier New", 36, bold=True)
             txt = font.render("AINDA NAO E O FIM", True, (255, 100, 100))
             txt_shadow = font.render("AINDA NAO E O FIM", True, (80, 20, 20))
             
@@ -521,7 +533,7 @@ class BattleState(BaseState):
             pass
 
         if 0.2 < progress < 0.85:
-            font = pygame.font.SysFont("Courier New", 28, bold=True)
+            font = get_font("Courier New", 28, bold=True)
             txt = font.render("TRANSFORMACAO", True, (255, 255, 255))
             txt_shadow = font.render("TRANSFORMACAO", True, (120, 10, 10))
             cx = W // 2 - txt.get_width() // 2
@@ -540,7 +552,7 @@ class BattleState(BaseState):
         else:
             screen.fill((0, 0, 0))
 
-        font_small = pygame.font.SysFont("Courier New", 12)
+        font_small = get_font("Courier New", 12)
 
         # Estado do efeito de morte
         is_dying, death_alpha = self._get_death_alpha()
@@ -572,7 +584,7 @@ class BattleState(BaseState):
             # desenha nome + nivel acima do sprite
             if img is not None:
                 rect = img.get_rect(midbottom=(px, py))
-                name_font = pygame.font.SysFont("Courier New", 14, bold=True)
+                name_font = get_font("Courier New", 14, bold=True)
                 lvl = getattr(self.player, 'level', 1)
                 label = f"{self.player.name}  Lv.{lvl}"
                 name_surf = name_font.render(label, True, (50, 200, 80))
@@ -619,7 +631,7 @@ class BattleState(BaseState):
                 # desenha o nome do inimigo acima do sprite
                 if img is not None:
                     rect = img.get_rect(midbottom=(ex, ey))
-                    name_font = pygame.font.SysFont("Courier New", 14, bold=True)
+                    name_font = get_font("Courier New", 14, bold=True)
                     lbl = name_font.render(self.enemy.name, True, (200, 40, 40))
                     lbl_r = lbl.get_rect(midbottom=(rect.centerx, rect.top - 6))
                     screen.blit(lbl, lbl_r)
@@ -631,7 +643,7 @@ class BattleState(BaseState):
                 rect = surf.get_rect(midbottom=(ex, ey))
                 pygame.draw.rect(surf, (80, 80, 80), surf.get_rect(), 2)
                 screen.blit(surf, rect)
-                name_font = pygame.font.SysFont("Courier New", 14, bold=True)
+                name_font = get_font("Courier New", 14, bold=True)
                 lbl = name_font.render(self.enemy.name, True, (200, 40, 40))
                 lbl_r = lbl.get_rect(midbottom=(rect.centerx, rect.top - 6))
                 screen.blit(lbl, lbl_r)
@@ -644,14 +656,29 @@ class BattleState(BaseState):
 
         # Desenha botoes centralizados embaixo (linha compacta)
         try:
+            mobile = getattr(self.game, 'mobile', False)
             btn_count = len(self._buttons)
-            total_w = BTN_W * btn_count + BTN_GAP * (btn_count - 1)
+            # Ajusta tamanho e fonte para mobile vs desktop
+            if mobile:
+                btn_w = max(120, BTN_W)
+                btn_h = max(40, BTN_H * 2)
+                gap = max(8, BTN_GAP * 2)
+                font = get_font("Courier New", 18, bold=True)
+            else:
+                btn_w = BTN_W
+                btn_h = BTN_H
+                gap = BTN_GAP
+                font = get_font("Courier New", 13)
+
+            total_w = btn_w * btn_count + gap * (btn_count - 1)
             start_x = W // 2 - total_w // 2
-            y = H - BTN_H - 10
+            y = H - btn_h - (20 if mobile else 10)
             for i, btn in enumerate(self._buttons):
-                bx = start_x + i * (BTN_W + BTN_GAP)
+                bx = start_x + i * (btn_w + gap)
                 btn.rect.topleft = (bx, y)
-                btn.draw(screen, pygame.font.SysFont("Courier New", 13))
+                btn.rect.width = btn_w
+                btn.rect.height = btn_h
+                btn.draw(screen, font)
         except Exception:
             pass
 

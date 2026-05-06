@@ -4,6 +4,7 @@ import pygame
 from entities.character import Character
 from entities.projectile import load_bullet_frames
 from core.sprite_animator import load_animations_from_folders, SpriteAnimator
+from core.paths import get_asset_path
 
 
 class Enemy(Character):
@@ -35,7 +36,7 @@ class Enemy(Character):
         # Caminho: assets/sprites/Enemy/<profile>/meta.json
         meta_path = None
         try:
-            base = os.path.join("assets", "sprites", "Enemy")
+            base = get_asset_path("sprites", "Enemy")
             folder = os.path.join(base, profile)
             meta_path = os.path.join(folder, "meta.json")
             if os.path.isfile(meta_path):
@@ -66,7 +67,7 @@ class Enemy(Character):
 
         # Tenta carregar animacoes de assets/sprites/Enemy/<profile>/
         try:
-            base = os.path.join("assets", "sprites", "Enemy")
+            base = get_asset_path("sprites", "Enemy")
             path = os.path.join(base, self.folder_name)
             animations = {}
             if os.path.isdir(path):

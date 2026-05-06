@@ -15,6 +15,7 @@ DIST_DIR = os.path.join(BUILD_DIR, "dist")
 MAIN_FILE = os.path.join(PROJECT_ROOT, "main.py")
 ASSETS_DIR = os.path.join(PROJECT_ROOT, "assets")
 SAVE_FILE = os.path.join(PROJECT_ROOT, "save.json")
+SAVE_DST = os.path.join(DIST_DIR, "save.json")
 
 def print_status(msg):
     print(f"\n{'='*60}")
@@ -76,8 +77,20 @@ def copy_files():
     os.makedirs(DIST_DIR, exist_ok=True)
     
     if os.path.exists(SAVE_FILE):
-        shutil.copy(SAVE_FILE, os.path.join(DIST_DIR, "save.json"))
-        print(f"[OK] Save copiado")
+        shutil.copy(SAVE_FILE, SAVE_DST)
+        print("[OK] Save copiado")
+    else:
+        with open(SAVE_DST, "w", encoding="utf-8") as f:
+            f.write('{' + '\n')
+            f.write('  "unlocked_players": ["Pablo"],\n')
+            f.write('  "defeated_bosses": [],\n')
+            f.write('  "defeated_final_bosses": [],\n')
+            f.write('  "defeated_enemies": [],\n')
+            f.write('  "enemy_round": 0,\n')
+            f.write('  "player_name": "",\n')
+            f.write('  "completed": false\n')
+            f.write('}' + '\n')
+        print("[OK] Save padrao criado")
     
     launcher = os.path.join(BUILD_DIR, "Jogar.bat")
     with open(launcher, "w") as f:

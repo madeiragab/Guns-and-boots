@@ -26,6 +26,49 @@ Install dependencies from the project file:
 pip install -r requirements.txt
 ```
 
+## Build & Mobile (quick)
+
+This project supports a desktop release workflow and a prepared mobile package.
+
+- Run locally (desktop):
+
+```powershell
+python main.py
+```
+
+- Run in mobile simulation mode (adjusts UI/input for touch):
+
+```powershell
+python main.py --mobile
+```
+
+- Create a Windows release (uses the project's virtualenv if present):
+
+```powershell
+.\build.bat
+```
+
+- Prepare mobile package (does not build APK, creates `mobile_package` with instructions):
+
+```powershell
+.\build.bat apk
+```
+
+Notes:
+- Building an APK requires external toolchains (Buildozer or Briefcase) and is not performed automatically by `build.bat`.
+- The `mobile_package/README-mobile.txt` contains steps to continue on a Linux/WSL or other Android-capable environment.
+
+Touch controls (mobile mode):
+- Tap action buttons at bottom: `ATIRAR`, `COBERTURA`, `ESPECIAL`, `MEDKIT`.
+- Menus: tap items to select; `OK` / `DEL` buttons appear on name input screen.
+
+Quick test (headless smoke test):
+
+```powershell
+& .venv\Scripts\python.exe tools/run_test.py
+```
+Should print `RUN_OK` when successful.
+
 ---
 
 ## Controls

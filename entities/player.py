@@ -8,11 +8,12 @@ from core.sprite_animator import (
     SpriteAnimator,
     draw as draw_sprite,
 )
+from core.paths import get_asset_path
 
 
 # Diretorio base contendo subpastas dos personagens jogaveis.
-PLAYERS_BASE = os.path.join("assets", "sprites", "Players")
-BOSSES_BASE = os.path.join("assets", "sprites", "Bosses")
+PLAYERS_BASE = get_asset_path("sprites", "Players")
+BOSSES_BASE = get_asset_path("sprites", "Bosses")
 # Deixa os sprites do jogador menores para renderizacao no jogo (aparece atras da UI, a esquerda)
 TARGET_FRAME_SIZE = (160, 160)
 

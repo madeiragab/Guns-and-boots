@@ -5,8 +5,9 @@ import pygame
 from entities.character import Character
 from entities.projectile import load_bullet_frames, _load_frames_from_folder
 from core.sprite_animator import load_animations_from_folders, SpriteAnimator
+from core.paths import get_asset_path
 
-FINAL_BOSSES_BASE = os.path.join("assets", "sprites", "Final Bosses")
+FINAL_BOSSES_BASE = get_asset_path("sprites", "Final Bosses")
 TARGET_FRAME_SIZE = (160, 160)
 
 

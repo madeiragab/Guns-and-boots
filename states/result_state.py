@@ -3,6 +3,8 @@ import random
 
 import pygame
 from states.base_state import BaseState
+from ui.font_cache import get_font
+from core.paths import get_asset_path
 
 WHITE  = (255, 255, 255)
 GRAY   = (100, 100, 100)
@@ -70,7 +72,7 @@ class ResultState(BaseState):
 
     # ------------------------------------------------------------------
     def _get_available_enemies(self):
-        base = os.path.join("assets", "sprites", "Enemy")
+        base = get_asset_path("sprites", "Enemy")
         folders = []
         try:
             for name in os.listdir(base):
@@ -81,7 +83,7 @@ class ResultState(BaseState):
         return [f for f in folders if f not in self.game.defeated_enemies]
 
     def _get_undefeated_bosses(self):
-        base = os.path.join("assets", "sprites", "Bosses")
+        base = get_asset_path("sprites", "Bosses")
         folders = []
         try:
             for name in os.listdir(base):
@@ -98,7 +100,7 @@ class ResultState(BaseState):
         return [f for f in folders if f not in defeated]
 
     def _get_undefeated_final_bosses(self):
-        base = os.path.join("assets", "sprites", "Final Bosses")
+        base = get_asset_path("sprites", "Final Bosses")
         folders = []
         try:
             for name in os.listdir(base):
@@ -116,7 +118,7 @@ class ResultState(BaseState):
     def _prepare_final_boss_retry(self):
         """On final-boss defeat, force a new run: 3 enemies + 1 boss before rematch."""
         boss_folders = []
-        base = os.path.join("assets", "sprites", "Bosses")
+        base = get_asset_path("sprites", "Bosses")
         try:
             for name in os.listdir(base):
                 if os.path.isdir(os.path.join(base, name)):
@@ -138,11 +140,9 @@ class ResultState(BaseState):
             self.game.defeated_bosses = [name for name in defeated_now if name != retry_boss]
 
         # Reinicia a progressao dos inimigos para o jogador limpar os inimigos antes do chefe novamente.
-        self.game.defeated_enemies = []
-        self.game.enemy_round = 0
+        self.game.reset_enemy_progress()
 
         # Mantem o modo campanha ativo e lembra qual chefe final deve ser tentado de novo.
-        self.game.completed = False
         self.game.final_boss_retry_target = self.enemy_profile
         self.game.save_game()
 
@@ -249,9 +249,9 @@ class ResultState(BaseState):
     # ------------------------------------------------------------------
     def draw(self, screen):
         W, H = screen.get_size()
-        font_big   = pygame.font.SysFont("Courier New", 48, bold=True)
-        font_mid   = pygame.font.SysFont("Courier New", 18)
-        font_small = pygame.font.SysFont("Courier New", 13)
+        font_big   = get_font("Courier New", 48, bold=True)
+        font_mid   = get_font("Courier New", 18)
+        font_small = get_font("Courier New", 13)
 
         fade_progress = min(1.0, self._fade_in_timer / self._fade_in_duration)
         alpha = int(255 * fade_progress)

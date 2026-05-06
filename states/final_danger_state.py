@@ -4,9 +4,11 @@ import math
 import pygame
 
 from states.base_state import BaseState
+from ui.font_cache import get_font
+from core.paths import get_asset_path
 
 W, H = 640, 360
-FINAL_BOSSES_BASE = os.path.join("assets", "sprites", "Final Bosses")
+FINAL_BOSSES_BASE = get_asset_path("sprites", "Final Bosses")
 MANDATORY_FINAL_BOSSES = ["Paulo"]
 MANDATORY_BOSSES = ["Pablo"]
 
@@ -80,7 +82,7 @@ class FinalDangerState(BaseState):
         return [name for name in folders if name not in defeated]
 
     def _all_regular_bosses_defeated(self):
-        bosses_base = os.path.join("assets", "sprites", "Bosses")
+        bosses_base = get_asset_path("sprites", "Bosses")
         bosses = []
         try:
             for name in os.listdir(bosses_base):
@@ -156,6 +158,6 @@ class FinalDangerState(BaseState):
         screen.blit(shard, (0, 0))
 
         if self._blink_visible:
-            font = pygame.font.SysFont("Courier New", 56, bold=True)
+            font = get_font("Courier New", 56, bold=True)
             text = font.render("BOSS FINAL", True, (255, 255, 255))
             screen.blit(text, (W // 2 - text.get_width() // 2, H // 2 - text.get_height() // 2))

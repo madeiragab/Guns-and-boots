@@ -1,6 +1,8 @@
 import pygame
 from states.base_state import BaseState
 from ui.button import Button
+from ui.font_cache import get_font
+from core.paths import get_asset_path
 
 WHITE = (255, 255, 255)
 GRAY  = (100, 100, 100)
@@ -47,6 +49,14 @@ class HubState(BaseState):
                 elif event.key == pygame.K_ESCAPE:
                     from states.title_state import TitleState
                     self.game.state_manager.change(TitleState(self.game))
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # allow tapping menu buttons on mobile
+                for i, btn in enumerate(self._buttons):
+                    if btn.handle_event(event, mobile=getattr(self.game, 'mobile', False)):
+                        self._selected = i
+                        self._update_selection()
+                        self._confirm()
+                        break
 
     def _confirm(self):
         choice = MENU_ITEMS[self._selected]
@@ -59,8 +69,8 @@ class HubState(BaseState):
                 # Modo livre: luta aleatoria contra qualquer chefe
                 from entities.boss import Boss
                 from entities.final_boss import FinalBoss
-                boss_base = os.path.join("assets", "sprites", "Bosses")
-                final_boss_base = os.path.join("assets", "sprites", "Final Bosses")
+                boss_base = get_asset_path("sprites", "Bosses")
+                final_boss_base = get_asset_path("sprites", "Final Bosses")
                 all_bosses = []
                 all_final_bosses = []
                 try:
@@ -98,15 +108,14 @@ class HubState(BaseState):
 
             from entities.enemy import Enemy
             # Nova partida - reinicia a progressao dos inimigos e o nivel do jogador
-            self.game.defeated_enemies = []
-            self.game.enemy_round = 0
+            self.game.reset_campaign_progress()
             self.game.player.level = 1
             self.game.player.atk = 7
             self.game.player.max_hp = 30
             self.game.player.hp = 30
 
             # Procura pastas de inimigos disponiveis em assets/sprites/Enemy
-            base = os.path.join("assets", "sprites", "Enemy")
+            base = get_asset_path("sprites", "Enemy")
             enemy_folders = []
             try:
                 for name in os.listdir(base):
@@ -138,9 +147,9 @@ class HubState(BaseState):
 
     def draw(self, screen):
         W, H = screen.get_size()
-        font_title = pygame.font.SysFont("Courier New", 26, bold=True)
-        font_small = pygame.font.SysFont("Courier New", 13)
-        font_btn   = pygame.font.SysFont("Courier New", 16)
+        font_title = get_font("Courier New", 26, bold=True)
+        font_small = get_font("Courier New", 13)
+        font_btn   = get_font("Courier New", 16)
 
         # Titulo
         welcome = font_title.render(

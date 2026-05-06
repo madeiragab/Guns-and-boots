@@ -1,6 +1,8 @@
 import os
 import pygame
 from states.base_state import BaseState
+from ui.font_cache import get_font
+from core.paths import get_asset_path
 
 WHITE  = (255, 255, 255)
 GRAY   = (100, 100, 100)
@@ -9,7 +11,7 @@ RED    = (200, 40,  40)
 BLACK  = (0,   0,   0)
 
 W, H = 640, 360
-BG_PATH = os.path.join("assets", "sprites", "background.png")
+BG_PATH = get_asset_path("sprites", "background.png")
 
 
 class TitleState(BaseState):
@@ -82,9 +84,9 @@ class TitleState(BaseState):
         else:
             screen.fill(BLACK)
 
-        font_big   = pygame.font.SysFont("Courier New", 36, bold=True)
-        font_mid   = pygame.font.SysFont("Courier New", 16, bold=True)
-        font_small = pygame.font.SysFont("Courier New", 14)
+        font_big   = get_font("Courier New", 36, bold=True)
+        font_mid   = get_font("Courier New", 16, bold=True)
+        font_small = get_font("Courier New", 14)
 
         title = font_big.render("GUNS AND BOOTS", True, WHITE)
         screen.blit(title, (W // 2 - title.get_width() // 2, H // 3))

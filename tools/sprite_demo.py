@@ -15,6 +15,7 @@ os.chdir(ROOT)
 
 import pygame
 from core.sprite_animator import load_animations_from_folders, SpriteAnimator, draw
+from core.paths import get_asset_path
 
 W, H = 640, 360
 
@@ -25,7 +26,7 @@ def main():
     pygame.display.set_caption("Sprite Animator Demo")
     clock = pygame.time.Clock()
 
-    base = os.path.join("assets", "sprites", "Players", "Player 1")
+    base = get_asset_path("sprites", "Players", "Player 1")
     target_size = (160, 160)
     animations = load_animations_from_folders(base, scale=1, target_size=target_size)
 
