@@ -50,7 +50,7 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install --user cython
           python3 -m pip install --user buildozer
-          echo "::add-path::${HOME}/.local/bin"
+          echo "${HOME}/.local/bin" >> "$GITHUB_PATH"
 
       - name: Show buildozer version
         run: ~/.local/bin/buildozer --version || buildozer --version
