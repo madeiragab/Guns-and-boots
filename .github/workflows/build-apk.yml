@@ -37,7 +37,8 @@ jobs:
           libharfbuzz0b \
           libwebp6 \
           libtiffxx5 \
-          libopenjp2-tools
+          libopenjp2-tools \
+          libncurses6
     
     - name: Install Buildozer and Cython
       run: |
