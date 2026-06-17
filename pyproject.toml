@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Guns and Boots"
+version = "1.0.0"
+description = "A tactical combat game"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+dependencies = [
+    "pygame>=2.1.0",
+]
+
+[tool.briefcase]
+project_name = "Guns and Boots"
+bundle = "com.gunsandboots"
+version = "1.0.0"
+description = "A tactical combat game"
+
+[tool.briefcase.app.gunsandboots]
+formal_name = "Guns and Boots"
+description = "A tactical combat game"
+bundle = "com.gunsandboots"
+url = "https://github.com/yourusername/gunsandboots"
+author = "Your Name"
+author_email = "your.email@example.com"
+sources = ["gunsandboots"]
+entry_point = "gunsandboots.main"
+
+[tool.briefcase.app.gunsandboots.android]
+requires = ["pygame", "jnius"]
+permissions = ["android.permission.INTERNET"]
+orientation = "portrait"
+
+[[tool.briefcase.app.gunsandboots.android.gradle_dependencies]]
+gradle = "androidx.appcompat:appcompat:1.6.1"
+
+[tool.briefcase.app.gunsandboots.android.variant.release]
+manifest_template = "android/AndroidManifest.xml"

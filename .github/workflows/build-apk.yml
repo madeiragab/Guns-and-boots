@@ -1,0 +1,69 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          git \
+          python3-dev \
+          openjdk-17-jdk-headless \
+          libjpeg-dev \
+          zlib1g-dev \
+          libpng-dev \
+          libopenjp2-7-dev \
+          libtiff-dev \
+          libfreetype6-dev \
+          libharfbuzz0b \
+          libwebp6 \
+          libtiffxx5 \
+          libopenjp2-tools
+    
+    - name: Install Buildozer and Cython
+      run: |
+        pip install --upgrade pip setuptools wheel
+        pip install buildozer cython
+    
+    - name: Build APK with Buildozer
+      run: |
+        buildozer android release -v
+    
+    - name: Upload APK to artifacts
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Guns-and-Boots-APK
+        path: bin/*.apk
+        retention-days: 30
+        compression-level: 0
+    
+    - name: Create Release
+      if: success()
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.0-${{ github.run_number }}
+        release_name: Guns and Boots v1.0.0 Build ${{ github.run_number }}
+        draft: false
+        prerelease: false

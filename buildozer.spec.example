@@ -1,0 +1,56 @@
+[app]
+# (str) Title of your application
+title = Guns and Boots
+
+# (str) Package name
+package.name = gunsandboots
+
+# (str) Package domain (reverse DNS)
+package.domain = madeiragab.example
+
+# (list) Source files to include (let empty to include all)
+source.include_exts = py,png,jpg,kv,json
+
+# (str) Application entry point (default: main.py)
+# Change only if your entry point is different
+
+# (list) Requirements
+# NOTE: Packaging a Pygame-based project for Android requires the right
+# python-for-android recipes and SDL2 bootstrap. This example uses 'pygame'
+# but you may need to adapt to 'pygame_sdl2' or enable SDL2 bootstrap.
+requirements = python3,pygame
+
+# (str) Supported orientation (portrait/landscape)
+orientation = landscape
+
+# (int) Android API to target
+android.api = 30
+
+# (str) Android NDK version (example)
+android.ndk = 21b
+
+# (str) Android entry point, for SDL2 apps typically org.kivy.android.PythonActivity
+# android.entrypoint = org.kivy.android.PythonActivity
+
+# (list) Permissions
+android.permissions = INTERNET
+
+# (int) Version code
+version.code = 1
+
+# (str) Version name
+version = 0.1
+
+# (str) Icon
+# icon.filename = %(source.dir)s/data/icon.png
+
+# Logging
+log_level = 1
+
+# (bool) Copy libraries instead of symlinks (useful on some build hosts)
+copy-libs = 1
+
+
+# Further customization may be required depending on the target packaging tool.
+# If your project uses pure Pygame, building an APK may need additional recipes
+# or a different bootstrap. Use this file as a starting point and adjust as needed.

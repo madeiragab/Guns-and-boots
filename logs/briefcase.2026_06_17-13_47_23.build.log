@@ -1,0 +1,565 @@
+Date/Time:       2026-06-17 13:47:32 
+Command line:    C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Scripts\briefcase build android
+
+OS Release:      Windows 11
+OS Version:      10.0.26200
+Architecture:    AMD64
+Platform:        Windows-11-10.0.26200-SP0
+
+Python exe:      C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Scripts\python.exe
+Python version:  3.13.9 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 19:09:58) [MSC v.1929 64 bit (AMD64)]
+Virtual env:     True
+Conda env:       False
+
+Briefcase:       0.4.2
+Target platform: android
+Target format:   gradle
+
+Environment Variables:
+	ALLUSERSPROFILE=C:\ProgramData
+	APPDATA=C:\Users\gabri\AppData\Roaming
+	BUNDLED_DEBUGPY_PATH=c:\Users\gabri\.vscode\extensions\ms-python.debugpy-2026.6.0-win32-x64\bundled\libs\debugpy
+	CHROME_CRASHPAD_PIPE_NAME=\\.\pipe\crashpad_10448_IKABKAKHTYUQQQIB
+	COLORTERM=truecolor
+	COMMONPROGRAMFILES=C:\Program Files\Common Files
+	COMMONPROGRAMFILES(X86)=C:\Program Files (x86)\Common Files
+	COMMONPROGRAMW6432=C:\Program Files\Common Files
+	COMPUTERNAME=DAROSAS
+	COMSPEC=C:\WINDOWS\system32\cmd.exe
+	DRIVERDATA=C:\Windows\System32\Drivers\DriverData
+	EFC_16524_1592913036=1
+	GIT_ASKPASS=********************
+	HOMEDRIVE=C:
+	HOMEPATH=\Users\gabri
+	LANG=en_US.UTF-8
+	LOCALAPPDATA=C:\Users\gabri\AppData\Local
+	LOGONSERVER=\\DAROSAS
+	NUMBER_OF_PROCESSORS=8
+	ONEDRIVE=C:\Users\gabri\OneDrive
+	ONEDRIVECONSUMER=C:\Users\gabri\OneDrive
+	OS=Windows_NT
+	PATH=C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Scripts;c:\Users\gabri\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\debugCommand;c:\Users\gabri\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\copilotCli;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Git\cmd;C:\Program Files\dotnet\;C:\Users\gabri\.local\bin;C:\Users\gabri\anaconda3;C:\Users\gabri\anaconda3\Library\mingw-w64\bin;C:\Users\gabri\anaconda3\Library\usr\bin;C:\Users\gabri\anaconda3\Library\bin;C:\Users\gabri\anaconda3\Scripts;C:\Users\gabri\AppData\Local\Microsoft\WindowsApps;C:\Users\gabri\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\gabri\AppData\Local\GitHubDesktop\bin;c:\Users\gabri\.vscode\extensions\ms-python.debugpy-2026.6.0-win32-x64\bundled\scripts\noConfigScripts
+	PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+	PROCESSOR_ARCHITECTURE=AMD64
+	PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 165 Stepping 2, GenuineIntel
+	PROCESSOR_LEVEL=6
+	PROCESSOR_REVISION=a502
+	PROGRAMDATA=C:\ProgramData
+	PROGRAMFILES=C:\Program Files
+	PROGRAMFILES(X86)=C:\Program Files (x86)
+	PROGRAMW6432=C:\Program Files
+	PSEXECUTIONPOLICYPREFERENCE=RemoteSigned
+	PSMODULEPATH=C:\Users\gabri\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+	PUBLIC=C:\Users\Public
+	PYDEVD_DISABLE_FILE_VALIDATION=1
+	PYTHONSTARTUP=c:\Users\gabri\AppData\Roaming\Code\User\workspaceStorage\0f2567e496fc3eb3a79cea16aff4d2a0\ms-python.python\pythonrc.py
+	PYTHON_BASIC_REPL=1
+	SESSIONNAME=Console
+	SYSTEMDRIVE=C:
+	SYSTEMROOT=C:\WINDOWS
+	TEMP=C:\Users\gabri\AppData\Local\Temp
+	TERM_PROGRAM=vscode
+	TERM_PROGRAM_VERSION=1.124.2
+	TMP=C:\Users\gabri\AppData\Local\Temp
+	USERDOMAIN=DAROSAS
+	USERDOMAIN_ROAMINGPROFILE=DAROSAS
+	USERNAME=gabri
+	USERPROFILE=C:\Users\gabri
+	VIRTUAL_ENV=C:\Users\gabri\Documents\GitHub\Guns and boots\.venv
+	VIRTUAL_ENV_PROMPT=.venv
+	VSCODE_A11Y_MODE=0
+	VSCODE_DEBUGPY_ADAPTER_ENDPOINTS=c:\Users\gabri\.vscode\extensions\ms-python.debugpy-2026.6.0-win32-x64\.noConfigDebugAdapterEndpoints\endpoint-484d43aa4fd999fa.txt
+	VSCODE_GIT_ASKPASS_EXTRA_ARGS=********************
+	VSCODE_GIT_ASKPASS_MAIN=********************
+	VSCODE_GIT_ASKPASS_NODE=********************
+	VSCODE_GIT_IPC_HANDLE=\\.\pipe\vscode-git-9e288cb8c4-sock
+	VSCODE_INJECTION=1
+	VSCODE_NONCE=e78eb85c-850b-4088-bf81-d11c3d6e1701
+	VSCODE_STABLE=1
+	WINDIR=C:\WINDOWS
+	_OLD_VIRTUAL_PATH=c:\Users\gabri\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\debugCommand;c:\Users\gabri\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\copilotCli;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Git\cmd;C:\Program Files\dotnet\;C:\Users\gabri\.local\bin;C:\Users\gabri\anaconda3;C:\Users\gabri\anaconda3\Library\mingw-w64\bin;C:\Users\gabri\anaconda3\Library\usr\bin;C:\Users\gabri\anaconda3\Library\bin;C:\Users\gabri\anaconda3\Scripts;C:\Users\gabri\AppData\Local\Microsoft\WindowsApps;C:\Users\gabri\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\gabri\AppData\Local\GitHubDesktop\bin;c:\Users\gabri\.vscode\extensions\ms-python.debugpy-2026.6.0-win32-x64\bundled\scripts\noConfigScripts
+
+pyproject.toml:
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Guns and Boots"
+version = "1.0.0"
+description = "A tactical combat game"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+dependencies = [
+    "pygame>=2.1.0",
+]
+
+[tool.briefcase]
+project_name = "Guns and Boots"
+bundle = "com.gunsandboots"
+version = "1.0.0"
+description = "A tactical combat game"
+
+[tool.briefcase.app.gunsandboots]
+formal_name = "Guns and Boots"
+description = "A tactical combat game"
+bundle = "com.gunsandboots"
+url = "https://github.com/yourusername/gunsandboots"
+author = "Your Name"
+author_email = "your.email@example.com"
+sources = ["gunsandboots"]
+entry_point = "gunsandboots.main"
+
+[tool.briefcase.app.gunsandboots.android]
+requires = ["pygame", "jnius"]
+permissions = ["android.permission.INTERNET"]
+orientation = "portrait"
+
+[[tool.briefcase.app.gunsandboots.android.gradle_dependencies]]
+gradle = "androidx.appcompat:appcompat:1.6.1"
+
+[tool.briefcase.app.gunsandboots.android.variant.release]
+manifest_template = "android/AndroidManifest.xml"
+
+Briefcase Log:
+[13:38:51]                                                                                                                                                               java.py:246
+           [java] A Java 17 JDK was not found; downloading and installing...                                                                                             java.py:246
+           To use an existing JDK 17 instance, specify its root directory path in the JAVA_HOME environment variable.                                                    java.py:253
+                                                                                                                                                                         java.py:258
+[13:38:52] Downloading OpenJDK17U-jdk_x64_windows_hotspot_17.0.17_10.zip...                                                                                              file.py:228
+[13:40:07] Installing OpenJDK... started                                                                                                                                 java.py:289
+[13:40:09] Installing OpenJDK... done                                                                                                                                    java.py:289
+           Using JDK at C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\java17                                                                                java.py:263
+                                                                                                                                                                  android_sdk.py:345
+           [android_sdk] The Android SDK was not found; downloading and installing...                                                                             android_sdk.py:345
+           To use an existing Android SDK instance, specify its root directory path in the ANDROID_HOME environment variable.                                     android_sdk.py:349
+                                                                                                                                                                  android_sdk.py:353
+[13:40:10] Downloading commandlinetools-win-13114758_latest.zip...                                                                                                       file.py:228
+[13:40:13] Installing Android SDK Command-Line Tools 19.0... started                                                                                              android_sdk.py:404
+[13:40:17] Installing Android SDK Command-Line Tools 19.0... done                                                                                                 android_sdk.py:404
+           Removing older Android SDK packages... started                                                                                                         android_sdk.py:444
+           Removing older Android SDK packages... done                                                                                                            android_sdk.py:444
+                                                                                                                                                                  android_sdk.py:580
+           The Android tools provided by Google have license terms that you must accept                                                                           android_sdk.py:580
+           before you may use those tools.                                                                                                                        android_sdk.py:580
+                                                                                                                                                                   subprocess.py:844
+           >>> Running Command:                                                                                                                                    subprocess.py:844
+           >>>     'C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk\cmdline-tools\19.0\bin\sdkmanager.bat' --licenses                       subprocess.py:844
+           >>> Working Directory:                                                                                                                                  subprocess.py:844
+           >>>     C:\Users\gabri\Documents\GitHub\Guns and boots                                                                                                  subprocess.py:844
+           >>> Environment Overrides:                                                                                                                              subprocess.py:844
+           >>>     ANDROID_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                             subprocess.py:844
+           >>>     ANDROID_SDK_ROOT=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                         subprocess.py:844
+           >>>     JAVA_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\java17                                                                     subprocess.py:844
+[13:42:50] >>> Return code: 0                                                                                                                                      subprocess.py:844
+                                                                                                                                                                   subprocess.py:844
+           Using Android SDK at C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                            android_sdk.py:359
+[13:42:51]                                                                                                                                                             create.py:961
+           [gunsandboots] Generating application template...                                                                                                           create.py:961
+                                                                                                                                                                       gradle.py:197
+           *************************************************************************                                                                                   gradle.py:197
+           ** WARNING: App does not define build_gradle_dependencies              **                                                                                   gradle.py:197
+           *************************************************************************                                                                                   gradle.py:197
+                                                                                                                                                                       gradle.py:197
+               The Android configuration for this app does not contain a                                                                                               gradle.py:197
+               `build_gradle_dependencies` definition. Briefcase will use a default                                                                                    gradle.py:197
+               value of:                                                                                                                                               gradle.py:197
+                                                                                                                                                                       gradle.py:197
+                   build_gradle_dependencies = [                                                                                                                       gradle.py:197
+                       "androidx.appcompat:appcompat:1.0.2",                                                                                                           gradle.py:197
+                       "androidx.constraintlayout:constraintlayout:1.1.3",                                                                                             gradle.py:197
+                       "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",                                                                                         gradle.py:197
+                   ]                                                                                                                                                   gradle.py:197
+                                                                                                                                                                       gradle.py:197
+               You should add this definition to the Android configuration                                                                                             gradle.py:197
+               of your project's pyproject.toml file. See:                                                                                                             gradle.py:197
+                                                                                                                                                                       gradle.py:197
+                   https://briefcase.readthedocs.io/en/stable/reference/platforms/android/gradle.html#build-gradle-dependencies                                        gradle.py:197
+                                                                                                                                                                       gradle.py:197
+               for more information.                                                                                                                                   gradle.py:197
+                                                                                                                                                                       gradle.py:197
+           *************************************************************************                                                                                   gradle.py:197
+                                                                                                                                                                       gradle.py:197
+           Using app template: https://github.com/beeware/briefcase-android-gradle-template.git, branch v0.4.2                                                          base.py:1354
+           Cloning template 'https://github.com/beeware/briefcase-android-gradle-template.git'...                                                                       base.py:1179
+[13:42:53] Using existing template (sha 184b6ed055bff4aeefb4517525cb190a3dba1eff, updated Mon Mar 23 21:11:25 2026)                                                     base.py:1255
+[13:42:55]                                                                                                                                                             create.py:983
+           [gunsandboots] Installing support package...                                                                                                                create.py:983
+           No support package required.                                                                                                                                create.py:343
+                                                                                                                                                                      create.py:1001
+           [gunsandboots] Installing application code...                                                                                                              create.py:1001
+           Installing gunsandboots... started                                                                                                                          create.py:757
+           Installing gunsandboots... done                                                                                                                             create.py:757
+                                                                                                                                                                      create.py:1004
+           [gunsandboots] Installing requirements...                                                                                                                  create.py:1004
+           Writing requirements file... started                                                                                                                        create.py:552
+           Writing requirements file... done                                                                                                                           create.py:552
+                                                                                                                                                                      create.py:1007
+           [gunsandboots] Installing application resources...                                                                                                         create.py:1007
+                                                                                                                                                                      create.py:1012
+           [gunsandboots] Removing unneeded app content...                                                                                                            create.py:1012
+           Removing unneeded app bundle content... started                                                                                                             create.py:921
+           Removing unneeded app bundle content... done                                                                                                                create.py:921
+                                                                                                                                                                      create.py:1015
+           [gunsandboots] Created build\gunsandboots\android\gradle                                                                                                   create.py:1015
+                                                                                                                                                                       gradle.py:378
+           [gunsandboots] Updating app metadata...                                                                                                                     gradle.py:378
+           Setting main module... started                                                                                                                              gradle.py:343
+           Setting main module... done                                                                                                                                 gradle.py:343
+           Setting packages to extract... started                                                                                                                      gradle.py:355
+           Setting packages to extract... done                                                                                                                         gradle.py:355
+                                                                                                                                                                       gradle.py:381
+           [gunsandboots] Building Android APK...                                                                                                                      gradle.py:381
+           Building... started                                                                                                                                         gradle.py:382
+           Downloading the Android emulator...                                                                                                                    android_sdk.py:635
+                                                                                                                                                                   subprocess.py:844
+           >>> Running Command:                                                                                                                                    subprocess.py:844
+           >>>     'C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk\cmdline-tools\19.0\bin\sdkmanager.bat' platform-tools emulator          subprocess.py:844
+           >>> Working Directory:                                                                                                                                  subprocess.py:844
+           >>>     C:\Users\gabri\Documents\GitHub\Guns and boots                                                                                                  subprocess.py:844
+           >>> Environment Overrides:                                                                                                                              subprocess.py:844
+           >>>     ANDROID_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                             subprocess.py:844
+           >>>     ANDROID_SDK_ROOT=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                         subprocess.py:844
+           >>>     JAVA_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\java17                                                                     subprocess.py:844
+[13:43:23] >>> Return code: 0                                                                                                                                      subprocess.py:844
+                                                                                                                                                                   subprocess.py:844
+                                                                                                                                                                   subprocess.py:844
+           >>> Running Command:                                                                                                                                    subprocess.py:844
+           >>>     'C:\Users\gabri\Documents\GitHub\Guns and boots\build\gunsandboots\android\gradle\gradlew.bat' --console plain assembleDebug                    subprocess.py:844
+           >>> Working Directory:                                                                                                                                  subprocess.py:844
+           >>>     C:\Users\gabri\Documents\GitHub\Guns and boots\build\gunsandboots\android\gradle                                                                subprocess.py:844
+           >>> Environment Overrides:                                                                                                                              subprocess.py:844
+           >>>     ANDROID_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                             subprocess.py:844
+           >>>     ANDROID_SDK_ROOT=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                         subprocess.py:844
+           >>>     JAVA_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\java17                                                                     subprocess.py:844
+[13:43:24] Downloading https://services.gradle.org/distributions/gradle-8.13-bin.zip                                                                               subprocess.py:196
+[13:44:23] ..................................................................................................................................                      subprocess.py:196
+           Unzipping C:\Users\gabri\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13-bin.zip to                                         subprocess.py:196
+           C:\Users\gabri\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d                                                                                           
+[13:44:39] Starting a Gradle Daemon (subsequent builds will be faster)                                                                                             subprocess.py:196
+[13:46:10] Checking the license for package Android SDK Build-Tools 35 in C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk\licenses          subprocess.py:196
+           License for package Android SDK Build-Tools 35 accepted.                                                                                                subprocess.py:196
+           Preparing "Install Android SDK Build-Tools 35 v.35.0.0".                                                                                                subprocess.py:196
+[13:46:14] "Install Android SDK Build-Tools 35 v.35.0.0" ready.                                                                                                    subprocess.py:196
+           Installing Android SDK Build-Tools 35 in C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk\build-tools\35.0.0                      subprocess.py:196
+           "Install Android SDK Build-Tools 35 v.35.0.0" complete.                                                                                                 subprocess.py:196
+           "Install Android SDK Build-Tools 35 v.35.0.0" finished.                                                                                                 subprocess.py:196
+           Checking the license for package Android SDK Platform 35 in C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk\licenses             subprocess.py:196
+           License for package Android SDK Platform 35 accepted.                                                                                                   subprocess.py:196
+           Preparing "Install Android SDK Platform 35 (revision 2)".                                                                                               subprocess.py:196
+[13:46:48] "Install Android SDK Platform 35 (revision 2)" ready.                                                                                                   subprocess.py:196
+           Installing Android SDK Platform 35 in C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk\platforms\android-35                       subprocess.py:196
+           "Install Android SDK Platform 35 (revision 2)" complete.                                                                                                subprocess.py:196
+           "Install Android SDK Platform 35 (revision 2)" finished.                                                                                                subprocess.py:196
+           [=========                              ] 25%                                                                                                           subprocess.py:196
+           [=========                              ] 25% Fetch remote repository...                                                                                subprocess.py:196
+           [=======================================] 100% Fetch remote repository...                                                                               subprocess.py:196
+                                                                                                                                                                   subprocess.py:196
+[13:46:52] > Task :app:preBuild UP-TO-DATE                                                                                                                         subprocess.py:196
+           > Task :app:preDebugBuild UP-TO-DATE                                                                                                                    subprocess.py:196
+           > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE                                                                                                     subprocess.py:196
+[13:47:17] > Task :app:extractDebugPythonBuildPackages                                                                                                             subprocess.py:196
+[13:47:19]                                                                                                                                                         subprocess.py:196
+           > Task :app:installDebugPythonRequirements                                                                                                              subprocess.py:196
+           Chaquopy: Installing for arm64-v8a                                                                                                                      subprocess.py:196
+[13:47:20] Looking in indexes: https://pypi.org/simple, https://chaquo.com/pypi-13.1                                                                               subprocess.py:196
+[13:47:22] ERROR: Could not find a version that satisfies the requirement pygame>=2.1.0 (from versions: none)                                                      subprocess.py:196
+           ERROR: No matching distribution found for pygame>=2.1.0                                                                                                 subprocess.py:196
+           ERROR: pip returned exit status 1. For advice, see https://chaquo.com/chaquopy/doc/current/faq.html#faq-pip.                                            subprocess.py:196
+                                                                                                                                                                   subprocess.py:196
+           > Task :app:installDebugPythonRequirements FAILED                                                                                                       subprocess.py:196
+                                                                                                                                                                   subprocess.py:196
+           [Incubating] Problems report is available at:                                                                                                           subprocess.py:196
+           file:///C:/Users/gabri/Documents/GitHub/Guns%20and%20boots/build/gunsandboots/android/gradle/build/reports/problems/problems-report.html                                 
+                                                                                                                                                                   subprocess.py:196
+           FAILURE: Build failed with an exception.                                                                                                                subprocess.py:196
+                                                                                                                                                                   subprocess.py:196
+           * What went wrong:                                                                                                                                      subprocess.py:196
+           Execution failed for task ':app:installDebugPythonRequirements'.                                                                                        subprocess.py:196
+           > Process 'command 'C:\Users\gabri\Documents\GitHub\Guns and boots\build\gunsandboots\android\gradle\app\build\python\env\debug\Scripts\python.exe''    subprocess.py:196
+           finished with non-zero exit value 1                                                                                                                                      
+                                                                                                                                                                   subprocess.py:196
+           * Try:                                                                                                                                                  subprocess.py:196
+           > Run with --stacktrace option to get the stack trace.                                                                                                  subprocess.py:196
+           > Run with --info or --debug option to get more log output.                                                                                             subprocess.py:196
+           > Run with --scan to get full insights.                                                                                                                 subprocess.py:196
+[13:47:23] > Get more help at https://help.gradle.org.                                                                                                             subprocess.py:196
+                                                                                                                                                                   subprocess.py:196
+           Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.                                                             subprocess.py:196
+                                                                                                                                                                   subprocess.py:196
+           You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.               subprocess.py:196
+                                                                                                                                                                   subprocess.py:196
+           For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle            subprocess.py:196
+           documentation.                                                                                                                                                           
+                                                                                                                                                                   subprocess.py:196
+           BUILD FAILED in 3m 58s                                                                                                                                  subprocess.py:196
+           2 actionable tasks: 2 executed                                                                                                                          subprocess.py:196
+           >>> Return code: 1                                                                                                                                      subprocess.py:844
+                                                                                                                                                                   subprocess.py:844
+           Building... errored                                                                                                                                         gradle.py:382
+                                                                                                                                                                      __main__.py:42
+           Error while building project.                                                                                                                              __main__.py:43
+           Saving log... started                                                                                                                                      console.py:543
+
+Main thread traceback:
+╭─────────────────────────────────────────────────────────────────────── Traceback (most recent call last) ────────────────────────────────────────────────────────────────────────╮
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\platforms\android\gradle.py:384 in build_app                                                    │
+│                                                                                                                                                                                  │
+│   381 │   │   self.console.info("Building Android APK...", prefix=app.app_name)                                                                                                  │
+│   382 │   │   with self.console.wait_bar("Building..."):                                                                                                                         │
+│   383 │   │   │   try:                                                                                                                                                           │
+│ ❱ 384 │   │   │   │   self.run_gradle(app, ["assembleDebug"])                                                                                                                    │
+│   385 │   │   │   except subprocess.CalledProcessError as e:                                                                                                                     │
+│   386 │   │   │   │   raise BriefcaseCommandError("Error while building project.") from e                                                                                        │
+│   387                                                                                                                                                                            │
+│                                                                                                                                                                                  │
+│ ╭─────────────────────────────────────────── locals ────────────────────────────────────────────╮                                                                                │
+│ │    app = <com.gunsandboots.gunsandboots v1.0.0 FinalizedAppConfig>                            │                                                                                │
+│ │ kwargs = {}                                                                                   │                                                                                │
+│ │   self = <briefcase.platforms.android.gradle.GradleBuildCommand object at 0x000002B8AFDC8590> │                                                                                │
+│ ╰───────────────────────────────────────────────────────────────────────────────────────────────╯                                                                                │
+│                                                                                                                                                                                  │
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\platforms\android\gradle.py:133 in run_gradle                                                   │
+│                                                                                                                                                                                  │
+│   130 │   │   self.tools.android_sdk.verify_emulator()                                                                                                                           │
+│   131 │   │                                                                                                                                                                      │
+│   132 │   │   gradlew = "gradlew.bat" if self.tools.host_os == "Windows" else "gradlew"                                                                                          │
+│ ❱ 133 │   │   self.tools.subprocess.run(                                                                                                                                         │
+│   134 │   │   │   # Windows needs the full path to `gradlew`; macOS & Linux can find it                                                                                          │
+│   135 │   │   │   # via `./gradlew`. For simplicity of implementation, we always provide                                                                                         │
+│   136 │   │   │   # the full path.                                                                                                                                               │
+│                                                                                                                                                                                  │
+│ ╭──────────────────────────────────────────── locals ────────────────────────────────────────────╮                                                                               │
+│ │     app = <com.gunsandboots.gunsandboots v1.0.0 FinalizedAppConfig>                            │                                                                               │
+│ │    args = ['assembleDebug']                                                                    │                                                                               │
+│ │ gradlew = 'gradlew.bat'                                                                        │                                                                               │
+│ │    self = <briefcase.platforms.android.gradle.GradleBuildCommand object at 0x000002B8AFDC8590> │                                                                               │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────╯                                                                               │
+│                                                                                                                                                                                  │
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\integrations\subprocess.py:143 in inner                                                         │
+│                                                                                                                                                                                  │
+│   140 │   │   # Run subprocess command with or without console control                                                                                                           │
+│   141 │   │   if remove_dynamic_elements:                                                                                                                                        │
+│   142 │   │   │   with sub.tools.console.release_console_control():                                                                                                              │
+│ ❱ 143 │   │   │   │   return sub_method(sub, args, *wrapped_args, **wrapped_kwargs)                                                                                              │
+│   144 │   │   else:                                                                                                                                                              │
+│   145 │   │   │   return sub_method(sub, args, *wrapped_args, **wrapped_kwargs)                                                                                                  │
+│   146                                                                                                                                                                            │
+│                                                                                                                                                                                  │
+│ ╭────────────────────────────────────────────────────────────────── locals ──────────────────────────────────────────────────────────────────╮                                   │
+│ │                    args = [                                                                                                                │                                   │
+│ │                           │   WindowsPath('C:/Users/gabri/Documents/GitHub/Guns and boots/build/gunsandboots/android/gradle/gradlew.bat'), │                                   │
+│ │                           │   '--console',                                                                                                 │                                   │
+│ │                           │   'plain',                                                                                                     │                                   │
+│ │                           │   'assembleDebug'                                                                                              │                                   │
+│ │                           ]                                                                                                                │                                   │
+│ │              executable = 'C:\\Users\\gabri\\Documents\\GitHub\\Guns and boots\\build\\gunsandboots\\android\\gradle'+12                   │                                   │
+│ │ remove_dynamic_elements = True                                                                                                             │                                   │
+│ │                     sub = <briefcase.integrations.subprocess.Subprocess object at 0x000002B8AFDC9400>                                      │                                   │
+│ │            wrapped_args = ()                                                                                                               │                                   │
+│ │          wrapped_kwargs = {                                                                                                                │                                   │
+│ │                           │   'env': {                                                                                                     │                                   │
+│ │                           │   │   'ANDROID_HOME': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk',       │                                   │
+│ │                           │   │   'ANDROID_SDK_ROOT': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk',   │                                   │
+│ │                           │   │   'JAVA_HOME': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\java17'                │                                   │
+│ │                           │   },                                                                                                           │                                   │
+│ │                           │   'cwd': WindowsPath('C:/Users/gabri/Documents/GitHub/Guns and boots/build/gunsandboots/android/gradle'),      │                                   │
+│ │                           │   'check': True,                                                                                               │                                   │
+│ │                           │   'encoding': 'CP1252'                                                                                         │                                   │
+│ │                           }                                                                                                                │                                   │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                                   │
+│                                                                                                                                                                                  │
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\integrations\subprocess.py:544 in run                                                           │
+│                                                                                                                                                                                  │
+│   541 │   │   # caller sets stream_output=False, then ensure_console_is_safe() will                                                                                              │
+│   542 │   │   # disable any dynamic console elements while the command runs.                                                                                                     │
+│   543 │   │   if stream_output:                                                                                                                                                  │
+│ ❱ 544 │   │   │   return self._run_and_stream_output(args, filter_func=filter_func, **kwargs)                                                                                    │
+│   545 │   │                                                                                                                                                                      │
+│   546 │   │   # Can't filter non-streamed output.                                                                                                                                │
+│   547 │   │   if filter_func:                                                                                                                                                    │
+│                                                                                                                                                                                  │
+│ ╭─────────────────────────────────────────────────────────────────────────────── locals ───────────────────────────────────────────────────────────────────────────────╮         │
+│ │          args = [WindowsPath('C:/Users/gabri/Documents/GitHub/Guns and boots/build/gunsandboots/android/gradle/gradlew.bat'), '--console', 'plain', 'assembleDebug'] │         │
+│ │   filter_func = None                                                                                                                                                 │         │
+│ │        kwargs = {                                                                                                                                                    │         │
+│ │                 │   'env': {                                                                                                                                         │         │
+│ │                 │   │   'ANDROID_HOME': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk',                                           │         │
+│ │                 │   │   'ANDROID_SDK_ROOT': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk',                                       │         │
+│ │                 │   │   'JAVA_HOME': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\java17'                                                    │         │
+│ │                 │   },                                                                                                                                               │         │
+│ │                 │   'cwd': WindowsPath('C:/Users/gabri/Documents/GitHub/Guns and boots/build/gunsandboots/android/gradle'),                                          │         │
+│ │                 │   'check': True,                                                                                                                                   │         │
+│ │                 │   'encoding': 'CP1252'                                                                                                                             │         │
+│ │                 }                                                                                                                                                    │         │
+│ │          self = <briefcase.integrations.subprocess.Subprocess object at 0x000002B8AFDC9400>                                                                          │         │
+│ │ stream_output = True                                                                                                                                                 │         │
+│ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯         │
+│                                                                                                                                                                                  │
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\integrations\subprocess.py:621 in _run_and_stream_output                                        │
+│                                                                                                                                                                                  │
+│   618 │   │   self._log_return_code(return_code)                                                                                                                                 │
+│   619 │   │                                                                                                                                                                      │
+│   620 │   │   if check and return_code:                                                                                                                                          │
+│ ❱ 621 │   │   │   raise subprocess.CalledProcessError(return_code, args, stderr=stderr)                                                                                          │
+│   622 │   │                                                                                                                                                                      │
+│   623 │   │   return subprocess.CompletedProcess(args, return_code, stderr=stderr)                                                                                               │
+│   624                                                                                                                                                                            │
+│                                                                                                                                                                                  │
+│ ╭────────────────────────────────────────────────────────────────────────────── locals ──────────────────────────────────────────────────────────────────────────────╮           │
+│ │        args = [WindowsPath('C:/Users/gabri/Documents/GitHub/Guns and boots/build/gunsandboots/android/gradle/gradlew.bat'), '--console', 'plain', 'assembleDebug'] │           │
+│ │       check = True                                                                                                                                                 │           │
+│ │ filter_func = None                                                                                                                                                 │           │
+│ │      kwargs = {                                                                                                                                                    │           │
+│ │               │   'env': {                                                                                                                                         │           │
+│ │               │   │   'ANDROID_HOME': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk',                                           │           │
+│ │               │   │   'ANDROID_SDK_ROOT': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\android_sdk',                                       │           │
+│ │               │   │   'JAVA_HOME': 'C:\\Users\\gabri\\AppData\\Local\\BeeWare\\briefcase\\Cache\\tools\\java17'                                                    │           │
+│ │               │   },                                                                                                                                               │           │
+│ │               │   'cwd': WindowsPath('C:/Users/gabri/Documents/GitHub/Guns and boots/build/gunsandboots/android/gradle'),                                          │           │
+│ │               │   'encoding': 'CP1252',                                                                                                                            │           │
+│ │               │   'stdout': -1,                                                                                                                                    │           │
+│ │               │   'stderr': -2,                                                                                                                                    │           │
+│ │               │   'bufsize': 1                                                                                                                                     │           │
+│ │               }                                                                                                                                                    │           │
+│ │     process = <Popen: returncode: 1 args: ['C:\\Users\\gabri\\Documents\\GitHub\\Guns and ...>                                                                     │           │
+│ │ return_code = 1                                                                                                                                                    │           │
+│ │        self = <briefcase.integrations.subprocess.Subprocess object at 0x000002B8AFDC9400>                                                                          │           │
+│ │      stderr = None                                                                                                                                                 │           │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+CalledProcessError: Command '[WindowsPath('C:/Users/gabri/Documents/GitHub/Guns and boots/build/gunsandboots/android/gradle/gradlew.bat'), '--console', 'plain', 'assembleDebug']' returned non-zero exit status 1.
+
+The above exception was the direct cause of the following exception:
+
+╭─────────────────────────────────────────────────────────────────────── Traceback (most recent call last) ────────────────────────────────────────────────────────────────────────╮
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\__main__.py:27 in main                                                                          │
+│                                                                                                                                                                                  │
+│   24 │   │   │   Path.cwd() / "pyproject.toml",                                                                                                                                  │
+│   25 │   │   │   overrides=overrides,                                                                                                                                            │
+│   26 │   │   )                                                                                                                                                                   │
+│ ❱ 27 │   │   command(**options)                                                                                                                                                  │
+│   28 │   except HelpText as e:                                                                                                                                                   │
+│   29 │   │   console.info()                                                                                                                                                      │
+│   30 │   │   console.info(str(e))                                                                                                                                                │
+│                                                                                                                                                                                  │
+│ ╭─────────────────────────────────────────────── locals ───────────────────────────────────────────────╮                                                                         │
+│ │       command = <briefcase.platforms.android.gradle.GradleBuildCommand object at 0x000002B8AFDC8590> │                                                                         │
+│ │       console = <briefcase.console.Console object at 0x000002B8AC7F8050>                             │                                                                         │
+│ │             e = BriefcaseCommandError('Error while building project.')                               │                                                                         │
+│ │ extra_cmdline = []                                                                                   │                                                                         │
+│ │       options = {                                                                                    │                                                                         │
+│ │                 │   'update': False,                                                                 │                                                                         │
+│ │                 │   'update_requirements': False,                                                    │                                                                         │
+│ │                 │   'update_support': False,                                                         │                                                                         │
+│ │                 │   'update_stub': False,                                                            │                                                                         │
+│ │                 │   'update_resources': False,                                                       │                                                                         │
+│ │                 │   'no_update': False,                                                              │                                                                         │
+│ │                 │   'test_mode': False,                                                              │                                                                         │
+│ │                 │   'debugger': None                                                                 │                                                                         │
+│ │                 }                                                                                    │                                                                         │
+│ │     overrides = {}                                                                                   │                                                                         │
+│ │        result = 200                                                                                  │                                                                         │
+│ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯                                                                         │
+│                                                                                                                                                                                  │
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\commands\build.py:153 in __call__                                                               │
+│                                                                                                                                                                                  │
+│   150 │   │                                                                                                                                                                      │
+│   151 │   │   state = None                                                                                                                                                       │
+│   152 │   │   for _, app_obj in sorted(finalized_apps.items()):                                                                                                                  │
+│ ❱ 153 │   │   │   state = self._build_app(                                                                                                                                       │
+│   154 │   │   │   │   app_obj,                                                                                                                                                   │
+│   155 │   │   │   │   update=update,                                                                                                                                             │
+│   156 │   │   │   │   update_requirements=update_requirements,                                                                                                                   │
+│                                                                                                                                                                                  │
+│ ╭────────────────────────────────────────────────── locals ──────────────────────────────────────────────────╮                                                                   │
+│ │                   _ = 'gunsandboots'                                                                       │                                                                   │
+│ │                 app = None                                                                                 │                                                                   │
+│ │            app_name = None                                                                                 │                                                                   │
+│ │             app_obj = <com.gunsandboots.gunsandboots v1.0.0 FinalizedAppConfig>                            │                                                                   │
+│ │       apps_to_build = {'gunsandboots': <com.gunsandboots.gunsandboots v1.0.0 FinalizedAppConfig>}          │                                                                   │
+│ │            debugger = None                                                                                 │                                                                   │
+│ │      finalized_apps = {'gunsandboots': <com.gunsandboots.gunsandboots v1.0.0 FinalizedAppConfig>}          │                                                                   │
+│ │           no_update = False                                                                                │                                                                   │
+│ │             options = {}                                                                                   │                                                                   │
+│ │                self = <briefcase.platforms.android.gradle.GradleBuildCommand object at 0x000002B8AFDC8590> │                                                                   │
+│ │               state = None                                                                                 │                                                                   │
+│ │           test_mode = False                                                                                │                                                                   │
+│ │              update = False                                                                                │                                                                   │
+│ │ update_requirements = False                                                                                │                                                                   │
+│ │    update_resources = False                                                                                │                                                                   │
+│ │         update_stub = False                                                                                │                                                                   │
+│ │      update_support = False                                                                                │                                                                   │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                                                                   │
+│                                                                                                                                                                                  │
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\commands\build.py:92 in _build_app                                                              │
+│                                                                                                                                                                                  │
+│    89 │   │                                                                                                                                                                      │
+│    90 │   │   self.verify_app(app)                                                                                                                                               │
+│    91 │   │                                                                                                                                                                      │
+│ ❱  92 │   │   state = self.build_app(app, **full_options(state, options))                                                                                                        │
+│    93 │   │                                                                                                                                                                      │
+│    94 │   │   qualifier = " (test mode)" if app.test_mode else ""                                                                                                                │
+│    95 │   │   qualifier += " (debug mode)" if app.debugger else ""                                                                                                               │
+│                                                                                                                                                                                  │
+│ ╭────────────────────────────────────────────────── locals ──────────────────────────────────────────────────╮                                                                   │
+│ │                 app = <com.gunsandboots.gunsandboots v1.0.0 FinalizedAppConfig>                            │                                                                   │
+│ │           no_update = False                                                                                │                                                                   │
+│ │             options = {}                                                                                   │                                                                   │
+│ │                self = <briefcase.platforms.android.gradle.GradleBuildCommand object at 0x000002B8AFDC8590> │                                                                   │
+│ │               state = None                                                                                 │                                                                   │
+│ │              update = False                                                                                │                                                                   │
+│ │ update_requirements = False                                                                                │                                                                   │
+│ │    update_resources = False                                                                                │                                                                   │
+│ │         update_stub = False                                                                                │                                                                   │
+│ │      update_support = False                                                                                │                                                                   │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                                                                   │
+│                                                                                                                                                                                  │
+│ C:\Users\gabri\Documents\GitHub\Guns and boots\.venv\Lib\site-packages\briefcase\platforms\android\gradle.py:386 in build_app                                                    │
+│                                                                                                                                                                                  │
+│   383 │   │   │   try:                                                                                                                                                           │
+│   384 │   │   │   │   self.run_gradle(app, ["assembleDebug"])                                                                                                                    │
+│   385 │   │   │   except subprocess.CalledProcessError as e:                                                                                                                     │
+│ ❱ 386 │   │   │   │   raise BriefcaseCommandError("Error while building project.") from e                                                                                        │
+│   387                                                                                                                                                                            │
+│   388                                                                                                                                                                            │
+│   389 class GradleRunCommand(GradleMixin, RunCommand):                                                                                                                           │
+│                                                                                                                                                                                  │
+│ ╭─────────────────────────────────────────── locals ────────────────────────────────────────────╮                                                                                │
+│ │    app = <com.gunsandboots.gunsandboots v1.0.0 FinalizedAppConfig>                            │                                                                                │
+│ │ kwargs = {}                                                                                   │                                                                                │
+│ │   self = <briefcase.platforms.android.gradle.GradleBuildCommand object at 0x000002B8AFDC8590> │                                                                                │
+│ ╰───────────────────────────────────────────────────────────────────────────────────────────────╯                                                                                │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+BriefcaseCommandError: Error while building project.
+[13:47:24] Collecting extra information for log... started                                                                                                            console.py:581
+                                                                                                                                                                      console.py:585
+           Extra information:                                                                                                                                         console.py:586
+                                                                                                                                                                   subprocess.py:844
+           >>> Running Command:                                                                                                                                    subprocess.py:844
+           >>>     'C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk\cmdline-tools\19.0\bin\sdkmanager.bat' --list_installed                 subprocess.py:844
+           >>> Working Directory:                                                                                                                                  subprocess.py:844
+           >>>     C:\Users\gabri\Documents\GitHub\Guns and boots                                                                                                  subprocess.py:844
+           >>> Environment Overrides:                                                                                                                              subprocess.py:844
+           >>>     ANDROID_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                             subprocess.py:844
+           >>>     ANDROID_SDK_ROOT=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\android_sdk                                                         subprocess.py:844
+           >>>     JAVA_HOME=C:\Users\gabri\AppData\Local\BeeWare\briefcase\Cache\tools\java17                                                                     subprocess.py:844
+[13:47:32] >>> Command Output:                                                                                                                                     subprocess.py:844
+           >>>     Loading package information...                                                                                                                  subprocess.py:844
+           >>>     Loading local repository...                                                                                                                     subprocess.py:844
+           >>>     [=========                              ] 25% Loading local repository...                                                                       subprocess.py:844
+           >>>     [=========                              ] 25% Fetch remote repository...                                                                        subprocess.py:844
+           >>>     [=======================================] 100% Fetch remote repository...                                                                       subprocess.py:844
+           >>>                                                                                                                                                     subprocess.py:844
+           >>>     Installed packages:                                                                                                                             subprocess.py:844
+           >>>       Path                 | Version | Description                | Location                                                                        subprocess.py:844
+           >>>       -------              | ------- | -------                    | -------                                                                         subprocess.py:844
+           >>>       build-tools;35.0.0   | 35.0.0  | Android SDK Build-Tools 35 | build-tools\35.0.0                                                              subprocess.py:844
+           >>>       emulator             | 36.6.11 | Android Emulator           | emulator                                                                        subprocess.py:844
+           >>>       platform-tools       | 37.0.0  | Android SDK Platform-Tools | platform-tools                                                                  subprocess.py:844
+           >>>       platforms;android-35 | 2       | Android SDK Platform 35    | platforms\android-35                                                            subprocess.py:844
+           >>>                                                                                                                                                     subprocess.py:844
+           >>> Return code: 0                                                                                                                                      subprocess.py:844
+                                                                                                                                                                   subprocess.py:844
+           Collecting extra information for log... done                                                                                                               console.py:581

@@ -108,27 +108,46 @@ set "ANDROID_DIR=%DIST_DIR%\android"
 if exist "%ANDROID_DIR%" rmdir /s /q "%ANDROID_DIR%" >nul 2>&1
 mkdir "%ANDROID_DIR%" >nul 2>&1
 
-echo [*] Detectando WSL para build nativo Android (recomendado)...
+echo [*] Detectando WSL para build nativo Android...
 where wsl.exe >nul 2>&1
-if %errorlevel%==0 goto WSL_BUILD
+if %errorlevel%==0 (
+    rem check if any WSL distro is installed and available
+    wsl -l -q >nul 2>&1
+    if %errorlevel%==0 goto WSL_BUILD
+)
+echo [*] WSL nao encontrado — usando fallback (project.zip)
 goto APK_FALLBACK
 
 :WSL_BUILD
 echo [*] WSL encontrado — executando Buildozer dentro do WSL (pode demorar).
-echo [*] Entre no processo se solicitado (sudo apt installs).
-wsl bash -lc "cd \"$(wslpath '%CD%')\" && sudo apt-get update -y && sudo apt-get install -y --no-install-recommends python3-pip python3-venv openjdk-11-jdk git zip unzip zlib1g-dev libncurses5 libncurses5-dev libffi-dev libssl-dev libsqlite3-dev libjpeg-dev build-essential && python3 -m pip install --user --upgrade pip && python3 -m pip install --user cython buildozer && export PATH=\$HOME/.local/bin:\$PATH && ~/.local/bin/buildozer android debug"
+wsl -d Ubuntu -- bash -lc "mkdir -p /home/gabri/gunsandboots-build && rsync -a --delete --exclude=.buildozer --exclude=bin --exclude=.venv --exclude=release --exclude=__pycache__ --exclude=.git /mnt/c/Users/gabri/Documents/GitHub/Guns\ and\ boots/ /home/gabri/gunsandboots-build/ && cd /home/gabri/gunsandboots-build && python3.11 -m buildozer android debug"
+
+if errorlevel 1 (
+    echo [!] Buildozer falhou — nenhum APK sera copiado.
+    goto APK_DONE
+)
 
 echo [*] Copiando APK(s) gerados para %ANDROID_DIR% ...
 if not exist "%ANDROID_DIR%" mkdir "%ANDROID_DIR%" >nul 2>&1
-for %%f in ("%CD%\bin\*.apk") do copy /y "%%~f" "%ANDROID_DIR%\" >nul 2>&1
-echo [*] Se houver APKs, elas foram copiadas para %ANDROID_DIR%.
+set "APK_COPIED="
+for %%F in ("\\wsl$\Ubuntu\home\gabri\gunsandboots-build\bin\*.apk") do (
+    if exist "%%~fF" (
+        copy /y "%%~fF" "%ANDROID_DIR%\" >nul 2>&1
+        set "APK_COPIED=1"
+    )
+)
+
+if defined APK_COPIED (
+    echo [*] Se houver APKs, elas foram copiadas para %ANDROID_DIR%.
+) else (
+    echo [!] Nenhum APK foi encontrado para copiar em %ANDROID_DIR%.
+)
 goto APK_DONE
 
 :APK_FALLBACK
 echo [*] WSL nao encontrado — criando archive do projeto (project.zip) em %ANDROID_DIR% (exclui %DIST_DIR% e .venv)...
-powershell -noprofile -command "Get-ChildItem -Path '%ROOT_DIR%' -Force | Where-Object { $_.Name -ne '%DIST_DIR%' -and $_.Name -ne '.venv' } | Compress-Archive -DestinationPath '%ANDROID_DIR%\\project.zip' -Force" >nul 2>&1 || (
-    echo [!] Falha ao criar project.zip via PowerShell. Tentando fallback simples...
-)
+powershell -noprofile -command "Get-ChildItem -Path '%ROOT_DIR%' -Force | Where-Object { $_.Name -ne '%DIST_DIR%' -and $_.Name -ne '.venv' } | Compress-Archive -DestinationPath '%ANDROID_DIR%\\project.zip' -Force" >nul 2>&1
+if errorlevel 1 echo [!] Falha ao criar project.zip via PowerShell. Tentando fallback simples...
 echo [*] Gerando README com instrucoes de build para Android em %ANDROID_DIR% ...
 
 :APK_DONE
@@ -152,9 +171,8 @@ echo [*] Gerando README com instrucoes de build para Android em %ANDROID_DIR% ..
 ) > "%ANDROID_DIR%\README-mobile.txt"
 
 echo [*] Creating compressed project archive for easy transfer...
-powershell -noprofile -command "Compress-Archive -Path '%ANDROID_DIR%\project\*' -DestinationPath '%ANDROID_DIR%\project.zip' -Force" >nul 2>&1 || (
-    echo [!] Could not create zip via PowerShell; skipping archive.
-)
+powershell -noprofile -command "Compress-Archive -Path '%ANDROID_DIR%\project\*' -DestinationPath '%ANDROID_DIR%\project.zip' -Force" >nul 2>&1
+if errorlevel 1 echo [!] Could not create zip via PowerShell; skipping archive.
 
 echo.
 echo Mobile package prepared: %ANDROID_DIR%
