@@ -26,4 +26,6 @@ desktop.ini
 # Distribution / build
 dist/
 build/
+.buildozer/
+bin/
 *.egg-info/
