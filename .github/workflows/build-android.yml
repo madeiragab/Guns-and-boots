@@ -61,8 +61,8 @@ jobs:
         env:
           ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
           ANDROID_HOME: ${{ runner.temp }}/android-sdk
-          PATH: ${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${HOME}/.local/bin:${{ env.PATH }}
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:${HOME}/.local/bin:$PATH"
           # Ensure buildozer.spec exists; user should have configured requirements and package name
           if [ ! -f buildozer.spec ]; then
             echo 'No buildozer.spec found — aborting.'
