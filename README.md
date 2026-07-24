@@ -1,10 +1,21 @@
 # Guns and Boots
 
-A retro-futuristic 2D turn-based game built with Python and Pygame.
+A retro-futuristic 2D turn-based game built with Python and Pygame — with a
+heat/jam gambling mechanic, rule-based enemy AI and a final-battle
+transformation system.
 
 **Made by Gabriel Madeira**
 
 > Project developed for the **Special Topics** course in the **Computer Science** program at **IFSulDeMinas**.
+
+## Documentation
+
+| Doc | What's inside |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | Layers, state machine, main loop, audio, save system |
+| [docs/combat.md](docs/combat.md) | Every combat formula: hit chance, heat/jam, AI behavior |
+| [docs/adding-characters.md](docs/adding-characters.md) | How to add characters/bosses without touching code |
+| [docs/build.md](docs/build.md) | Windows .exe build, Android APK, CI |
 
 ---
 
@@ -139,6 +150,17 @@ Rule-based AI that considers:
 - Weapon heat -> uses cover when overheated
 - Enemy type -> bosses use specials more aggressively
 
+The **final boss** uses a separate utility-scoring brain: it detects
+guaranteed-kill windows, weighs expected damage per action and stays
+slightly unpredictable by picking among near-best options. Details in
+[docs/combat.md](docs/combat.md).
+
+### Final Battle & Boss Form (`entities/final_boss.py`, `states/final_danger_state.py`)
+After all bosses fall, a final gauntlet begins. During the final battle the
+player can trigger a **one-time boss-form transformation** — a comeback
+mechanic that boosts stats, refills heat/cooldowns and swaps the sprites to
+the character's boss visuals. Everything reverts when the battle ends.
+
 ### Sprite Animator (`core/sprite_animator.py` and `ui/sprite_loader.py`)
 Loads PNG frames from subfolders such as `idle`, `shoot`, `cover`, `damage`, `medkit`, and `special/anim`. Supports looping and one-shot animations with automatic return to idle, plus scaling, colorkey, and configurable FPS.
 
@@ -175,9 +197,10 @@ Guns and boots/
 |
 |- entities/                - gameplay objects
 |  |- character.py          - base stats, heat, jam, cover
-|  |- player.py             - player-controlled character
+|  |- player.py             - player-controlled character + boss form
 |  |- enemy.py              - regular enemies
 |  |- boss.py               - bosses
+|  |- final_boss.py         - final bosses
 |  '- projectile.py         - animated projectile with on_hit callback
 |
 |- states/                  - game screens / states
@@ -188,6 +211,7 @@ Guns and boots/
 |  |- hub_state.py          - hub / main menu
 |  |- battle_state.py       - turn-based battle
 |  |- danger_state.py       - transition before boss fight
+|  |- final_danger_state.py - transition before the final boss gauntlet
 |  |- result_state.py       - battle result screen
 |  '- credits_state.py      - final credits screen
 |

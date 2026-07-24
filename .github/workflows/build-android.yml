@@ -1,8 +1,7 @@
 name: Build Android APK
 
+# Build pesado (SDK + NDK, ate 3h) — roda apenas manualmente pela aba Actions.
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
