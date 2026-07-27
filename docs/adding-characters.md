@@ -1,3 +1,5 @@
+> 🇧🇷 [Português](adding-characters.pt-BR.md) · 🇬🇧 **English**
+
 # Adding Characters, Bosses and Enemies
 
 Characters are **discovered from the file system at runtime** — no code
