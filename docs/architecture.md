@@ -1,3 +1,5 @@
+> 🇧🇷 [Português](architecture.pt-BR.md) · 🇬🇧 **English**
+
 # Architecture
 
 Guns and Boots is organized in five decoupled layers. The rule of thumb:
