@@ -1,3 +1,5 @@
+> 🇧🇷 [Português](README.pt-BR.md) · 🇬🇧 **English**
+
 # Guns and Boots
 
 A retro-futuristic 2D turn-based game built with Python and Pygame — with a

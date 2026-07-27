@@ -1,3 +1,5 @@
+> 🇧🇷 [Português](combat.pt-BR.md) · 🇬🇧 **English**
+
 # Combat System
 
 All rules live in `systems/combat.py` and `entities/character.py`.
