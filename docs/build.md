@@ -1,3 +1,5 @@
+> 🇧🇷 [Português](build.pt-BR.md) · 🇬🇧 **English**
+
 # Build Guide
 
 ## Desktop (Windows executable)
